@@ -1,23 +1,19 @@
-# ANIFLIX NETWORK TAMIL
+# ANIFLIX NETWORK TAMIL — redesigned mobile-first website
 
-A responsive, static anime catalogue website. This version is download-link only; it does not stream or host video files.
+A static HTML/CSS/JavaScript anime discovery catalogue designed around the dark neon anime-app concept.
 
-## Files
-- `index.html` — page structure
-- `style.css` — responsive dark anime-inspired design
-- `script.js` — catalogue entries, search, category filters and download links
+## What's included
+- Responsive desktop and mobile layout with bottom navigation on phones
+- Dramatic original CSS anime-inspired hero artwork (no copyrighted character artwork embedded)
+- Search by title or genre, genre filters, A–Z and rating sorting
+- Anime detail popups and a local My List saved in the browser
+- Imported 151 catalogue entries from the supplied `Animes.txt` file (titles, genres, ratings and descriptions)
 
-## Add your anime entries
-Open `script.js` and edit the `animeList` array. Each entry supports:
-- `title`, `category`, `language`, `episodes`
-- `mark` and `colors` for the poster-style artwork
-- `description`
-- `downloads`: an array of `{ label, url }` objects
+## Run locally
+Open `index.html` in a browser, or serve this folder with any static web host.
 
-Replace the sample `https://t.me/your_channel` URLs with links you are authorised to share. Only list content you own, have permission to distribute, or that is legally available for download.
+## Deploy on Voroa
+Create a **Static Site** from this repository. Set the publish/root directory to `/` (or the repository root). No build command and no start command are needed. Upload/push all files in this folder to the repository's `main` branch.
 
-## Preview
-Open `index.html` in a browser. No build step or server is required.
-
-## Deploy
-Upload the three website files (`index.html`, `style.css`, `script.js`) to your static hosting provider, or connect this repository if the provider supports Git deployment. Set the site root to the folder containing `index.html`.
+## Catalogue data and content rights
+`catalogue.json` contains the descriptive catalogue fields extracted from the supplied text. Telegram bot deep-links were deliberately not copied into the public site. Add only watch/download destinations for videos you own, have licensed, or are otherwise authorised to distribute. This is a front-end demo; it does not host video files or provide a streaming backend.

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090611"><meta name="description" content="ANIFLIX NETWORK TAMIL — discover Tamil-dub anime.">
+<title>ANIFLIX NETWORK TAMIL</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="ambient a1"></div><div class="ambient a2"></div>
+<header class="topbar">
+  <a class="brand" href="#" aria-label="ANIFLIX home"><span class="brand-mark">A<span>✦</span></span><span class="brand-copy">ANIFLIX<small>NETWORK <b>TAMIL</b></small></span></a>
+  <div class="top-actions"><span class="dub-pill">✦ TAMIL DUB</span><button class="icon-btn" id="profileBtn" aria-label="Profile">◉</button></div>
+</header>
+<main>
+  <section class="hero" id="home">
+    <div class="hero-art">
+      <div class="hero-orbit"></div><div class="hero-sparks"></div>
+      <div class="hero-figure"><div class="figure-hair"></div><div class="figure-face"><i></i><i></i><b></b></div><div class="figure-coat"></div></div>
+      <div class="hero-stamp">ANIME<br><em>NEVER</em><br>ENDS</div>
+    </div>
+    <div class="hero-content">
+      <div class="eyebrow"><span class="pulse"></span> YOUR NEXT OBSESSION STARTS HERE</div>
+      <h1>ENTER THE<br><span>ANIMEVERSE.</span></h1>
+      <p>Discover your next favourite in our Tamil-dub anime collection.</p>
+      <div class="hero-meta"><span>✦ CURATED ANIME</span><span>•</span><span id="totalCount">150+ TITLES</span></div>
+      <button class="primary-btn" id="exploreBtn">EXPLORE ANIME <b>↗</b></button>
+    </div>
+    <div class="hero-bottom"><span>ANIFLIX ORIGINAL EXPERIENCE</span><span>SCROLL TO EXPLORE ↓</span></div>
+  </section>
+
+  <section class="search-wrap">
+    <div class="searchbox"><span>⌕</span><input id="searchInput" placeholder="Search anime, genre, or title..." autocomplete="off"><kbd>⌘ K</kbd><button id="clearSearch" aria-label="Clear search">×</button></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><div class="eyebrow">FIND YOUR VIBE</div><h2>EXPLORE <span>GENRES</span></h2></div><span class="section-note">PICK A WORLD</span></div>
+    <div class="genre-row" id="genreRow">
+      <button class="genre-chip active" data-genre="All">✦ All Anime</button>
+      <button class="genre-chip" data-genre="Action">⚔ Action</button>
+      <button class="genre-chip" data-genre="Adventure">🌌 Adventure</button>
+      <button class="genre-chip" data-genre="Fantasy">✧ Fantasy</button>
+      <button class="genre-chip" data-genre="Comedy">☻ Comedy</button>
+      <button class="genre-chip" data-genre="Romance">♡ Romance</button>
+      <button class="genre-chip" data-genre="Sports">◉ Sports</button>
+      <button class="genre-chip" data-genre="School">⌂ School</button>
+    </div>
+  </section>
+
+  <section class="section catalogue-section" id="catalogue">
+    <div class="section-head"><div><div class="eyebrow">THE COLLECTION</div><h2>ANIME <span>LIBRARY</span></h2></div><div class="result-count" id="resultCount"></div></div>
+    <div class="toolbar"><div class="tabs"><button class="tab active" data-sort="featured">Featured</button><button class="tab" data-sort="az">A–Z</button><button class="tab" data-sort="rating">Top rated</button></div><span class="tiny-label">TAMIL DUB COLLECTION</span></div>
+    <div class="anime-grid" id="animeGrid"></div>
+    <div class="empty-state" id="emptyState" hidden><div>✧</div><h3>NO ANIME FOUND</h3><p>Try another title or genre.</p><button class="outline-btn" id="resetBtn">RESET FILTERS</button></div>
+  </section>
+
+  <section class="join-panel">
+    <div class="join-icon">✦</div><div><div class="eyebrow">STAY IN THE LOOP</div><h2>THE NEXT EPISODE<br><span>STARTS WITH YOU.</span></h2><p>Follow your official community for announcements and updates.</p></div>
+    <a class="join-btn" href="https://t.me/" target="_blank" rel="noopener">COMMUNITY ↗</a>
+  </section>
+</main>
+<nav class="bottom-nav" aria-label="Main navigation">
+  <a class="nav-item selected" href="#home"><span>⌂</span>Home</a><a class="nav-item" href="#catalogue"><span>▦</span>Explore</a>
+  <button class="nav-item" id="navSearch"><span>⌕</span>Search</button><button class="nav-item" id="navSaved"><span>♡</span>My List</button>
+</nav>
+<div class="modal" id="animeModal" aria-hidden="true"><div class="modal-backdrop" data-close></div><article class="modal-card"><button class="modal-close" data-close aria-label="Close">×</button><div class="modal-cover" id="modalCover"><span class="modal-kicker">ANIFLIX • TAMIL DUB</span></div><div class="modal-body"><div class="eyebrow">ANIME PROFILE</div><h2 id="modalTitle"></h2><div class="modal-rating" id="modalRating"></div><p id="modalDesc"></p><div class="tag-list" id="modalGenres"></div><div class="modal-actions"><button class="primary-btn" id="saveBtn">♡ ADD TO MY LIST</button><span class="legal-note">Watch links can be added by the site owner for content they are authorised to distribute.</span></div></div></article></div>
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body></html>
