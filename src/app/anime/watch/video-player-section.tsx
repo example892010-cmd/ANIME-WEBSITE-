@@ -531,7 +531,7 @@ const VideoPlayerSection = () => {
               <AlertDescription className="text-xs text-amber-200/80 mt-1">
                 The primary video player is unavailable for this stream.
                 Download the{" "}
-                <strong className="text-amber-100">Kitsune Companion</strong>{" "}
+                <strong className="text-amber-100">ANIFLIX Companion</strong>{" "}
                 app for a smooth, ad-free experience in the primary player.
               </AlertDescription>
             </div>

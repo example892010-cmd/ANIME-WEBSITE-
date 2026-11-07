@@ -1,12 +1,12 @@
 {
-  "theme_color": "#07120d",
-  "background_color": "#07120d",
+  "theme_color": "#101014",
+  "background_color": "#101014",
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
   "name": "ANIFLIX NETWORK TAMIL",
   "short_name": "ANIFLIX",
-  "description": "ANIFLIX NETWORK TAMIL anime discovery and streaming",
+  "description": "ANIFLIX NETWORK TAMIL - Anime discovery and watchlist",
   "orientation": "portrait-primary",
   "icons": [
     {

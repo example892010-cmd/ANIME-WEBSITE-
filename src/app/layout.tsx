@@ -22,9 +22,9 @@ const geistSans = localFont({
 //   weight: "100 900",
 // });
 
-const APP_NAME = "Kitsune";
-const APP_DEFAULT_TITLE = "Kitsune | Anime Streaming";
-const APP_DESCRIPTION = "Stream your favourite anime with ease and no ads";
+const APP_NAME = "ANIFLIX NETWORK TAMIL";
+const APP_DEFAULT_TITLE = "ANIFLIX NETWORK TAMIL | Anime";
+const APP_DESCRIPTION = "ANIFLIX NETWORK TAMIL - Discover anime, explore releases and manage your watchlist.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
@@ -72,7 +72,7 @@ export default function RootLayout({
 
           gtag('config', 'G-X9RZ58XPH1');`}
         </Script>
-        <link rel="icon" href="/icon.png" type="image/png" sizes="192x192" />
+        <link rel="icon" href="/aniflix-logo.png" type="image/png" sizes="192x192" />
       </head>
       <body
         className={`${geistSans.className} antialiased max-w-[100vw] overflow-x-hidden`}

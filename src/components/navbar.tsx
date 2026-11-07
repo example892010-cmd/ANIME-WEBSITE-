@@ -81,8 +81,8 @@ const NavBar = () => {
         "fixed top-0 left-0 right-0 h-fit w-full z-[100] transition-all duration-300",
         "backdrop-blur-xl backdrop-saturate-150 border-b",
         isHeaderSticky
-          ? "bg-slate-950/65 border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
-          : "bg-slate-950/35 border-white/5",
+          ? "bg-[#101014]/90 border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+          : "bg-[#101014]/75 border-white/5",
       ])}
     >
       <Container className="flex items-center justify-between py-2 gap-20 ">
@@ -90,15 +90,13 @@ const NavBar = () => {
           href={ROUTES.HOME}
           className="flex items-center gap-1 cursor-pointer"
         >
-          <Image src="/icon.png" alt="logo" width={70} height={70} />
+          <Image src="/aniflix-logo.png" alt="ANIFLIX NETWORK TAMIL" width={66} height={66} priority className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover" />
           <h1
             className={cn([
               nightTokyo.className,
               "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-pink-600 tracking-widest",
             ])}
-          >
-            Kitsunee
-          </h1>
+          ><span className="max-w-[190px] text-sm sm:text-base font-extrabold tracking-wide leading-tight text-white">ANIFLIX <span className="text-emerald-400">NETWORK TAMIL</span></span></h1>
         </Link>
 
         <div className="hidden lg:flex items-center gap-10 ml-20">

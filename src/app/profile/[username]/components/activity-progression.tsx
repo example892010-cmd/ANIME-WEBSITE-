@@ -359,7 +359,7 @@ const ActivityProgression = ({ targetUser }: Props) => {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">
-                Joined Kitsune
+                Joined ANIFLIX NETWORK TAMIL
               </span>
               <span className="text-xs text-gray-300 font-semibold mt-0.5">
                 First joined in {formattedJoinedDate}

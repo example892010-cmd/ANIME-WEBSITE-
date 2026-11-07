@@ -4,7 +4,7 @@
 
 Watch your favourite anime anywhere, anytime. No ads, no popups.
 
-ANIFLIX NETWORK TAMIL is a customised anime discovery and streaming web application based on Kitsune built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), and [shadcn/ui](https://ui.shadcn.com/).
+ANIFLIX NETWORK TAMIL is a customised anime streaming web application based on this open-source project built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), and [shadcn/ui](https://ui.shadcn.com/).
 
 ---
 
@@ -15,7 +15,7 @@ ANIFLIX NETWORK TAMIL is a customised anime discovery and streaming web applicat
 - **Rich Anime Discovery**: Explore trending, popular, seasonal anime, search suggestions, and filters powered by AniList.
 - **Advanced Player**: Integrated ArtPlayer with custom HLS playback, audio/subtitles selector, and auto-skip for intro/outro.
 - **User Profiles & Sync**: Bookmarks and watch progress tracking powered by [PocketBase](https://pocketbase.io).
-- **Companion helper**: Lightweight optional desktop helper to bypass ISP restrictions and CORS blocking.
+- **Kitsune Companion**: Lightweight optional desktop helper to bypass ISP restrictions and CORS blocking.
 
 ---
 
@@ -24,7 +24,7 @@ ANIFLIX NETWORK TAMIL is a customised anime discovery and streaming web applicat
 - **Node.js**: `v20.x` or later (Node 20+ recommended)
 - **PocketBase**: For user authentication, bookmarks, and watch history
 - **(Optional) Redis**: For faster caching of AniList metadata and video manifests (in-memory cache is used if omitted)
-- **(Optional) Go**: `1.22+` if you want to run or build the Companion helper from source
+- **(Optional) Go**: `1.22+` if you want to run or build the Kitsune Companion from source
 
 ---
 
@@ -40,7 +40,7 @@ cp .env.example .env
 | ----------------------------- | -------- | ------------------------ | ------------------------------------------------------- |
 | `NEXT_PUBLIC_POCKETBASE_URL`  | Yes      | `http://localhost:8090`  | PocketBase instance URL                                 |
 | `REDIS_URL`                   | No       | _None_                   | Redis connection string (e.g. `redis://localhost:6379`) |
-| `NEXT_PUBLIC_LOCAL_PROXY_URL` | No       | `http://127.0.0.1:43210` | URL of the local Companion helper                      |
+| `NEXT_PUBLIC_LOCAL_PROXY_URL` | No       | `http://127.0.0.1:43210` | URL of the local Kitsune Companion                      |
 | `DOMAIN_URL`                  | No       | `localhost:3000`         | Host domain for OpenGraph cards                         |
 
 ---
@@ -92,7 +92,7 @@ Kitsune uses PocketBase to manage users, authentication, bookmarks, and watch hi
 
 ## ANIFLIX NETWORK TAMIL Companion
 
-The **Companion helper** is an optional desktop utility that runs locally on your computer (`http://127.0.0.1:43210`). It routes video streams directly from your personal IP address, bypassing ISP blocks, Cloudflare challenges, and browser CORS limitations.
+The **Kitsune Companion** is an optional desktop utility that runs locally on your computer (`http://127.0.0.1:43210`). It routes video streams directly from your personal IP address, bypassing ISP blocks, Cloudflare challenges, and browser CORS limitations.
 
 The web app automatically detects when Companion is running.
 

@@ -75,8 +75,8 @@ const HeroCarouselItem = ({ anime }: { anime: MediaList }) => {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       {/* Gradient Overlay */}
-      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent z-10"></div>
-      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent z-10"></div>
+      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-r from-slate-950/55 via-slate-950/25 to-transparent z-10"></div>
+      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-t from-slate-950/35 via-slate-950/10 to-transparent z-10"></div>
 
       {/* Content Section */}
       <div className="w-full h-[calc(100%-5.25rem)] relative z-20">

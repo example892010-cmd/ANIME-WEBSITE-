@@ -1,26 +1,12 @@
 import React from "react";
-import { DiscordLogoIcon, GitHubLogoIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 
-const Footer = () => {
-  return (
-    <footer className="w-full bg-base-300 shadow-xl p-5 flex flex-col items-center space-y-5">
-      <Image src="/icon.png" alt="logo" width="100" height="100" suppressHydrationWarning />
-      <div className="flex space-x-5 items-center">
-        <a href="https://github.com/Dovakiin0/Kitsune" target="_blank">
-            <GitHubLogoIcon suppressHydrationWarning width="25" height="25" />
-        </a>
-        <a href="https://discord.gg/6yAJ3XDHTt" target="_blank">
-            <DiscordLogoIcon suppressHydrationWarning width="25" height="25" />
-        </a>
-      </div>
-      <p className="text-sm text-gray-300">
-        Kitsune does not store any files on the server, we only link to the
-        media which is hosted on 3rd party services.
-      </p>
-      <p className="text-sm text-gray-300">&copy; Kitsune</p>
-    </footer>
-  );
-};
-
+const Footer = () => (
+  <footer className="w-full bg-[#101014] border-t border-white/10 px-5 py-8 flex flex-col items-center text-center space-y-4">
+    <Image src="/aniflix-logo.png" alt="ANIFLIX NETWORK TAMIL" width={88} height={88} className="rounded-full object-cover" />
+    <div className="font-extrabold tracking-wide text-white">ANIFLIX <span className="text-emerald-400">NETWORK TAMIL</span></div>
+    <p className="text-xs text-gray-400">Discover anime, explore new releases and enjoy your watchlist.</p>
+    <p className="text-xs text-gray-500">© {new Date().getFullYear()} ANIFLIX NETWORK TAMIL</p>
+  </footer>
+);
 export default Footer;
