@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAnimeStore } from "@/store/anime-store";
 import dynamic from "next/dynamic";
 
-const KitsunePlayer = dynamic(() => import("@/components/kitsune-player"), {
+const AniflixPlayer = dynamic(() => import("@/components/aniflix-player"), {
   ssr: false,
 });
 import { useGetEpisodeData } from "@/query/get-episode-data";
@@ -384,7 +384,7 @@ const VideoPlayerSection = () => {
           ></iframe>
         </div>
       ) : (
-        <KitsunePlayer
+        <AniflixPlayer
           key={`${activeEpisodeId}-${episodeData.sources?.[0]?.url}`}
           episodeInfo={episodeData}
           serversData={{
@@ -535,21 +535,13 @@ const VideoPlayerSection = () => {
                 app for a smooth, ad-free experience in the primary player.
               </AlertDescription>
             </div>
-            <Button
-              asChild
-              size="sm"
-              className="shrink-0 bg-[#e9376b] hover:bg-[#d42d5e] text-white font-semibold text-xs px-3.5 h-8 shadow-sm"
-            >
-              <a
-                href={COMPANION_DOWNLOAD_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download Companion App
-              </a>
-            </Button>
+            {COMPANION_DOWNLOAD_URL ? (
+              <Button asChild size="sm" className="shrink-0 bg-emerald-500 text-slate-950 hover:bg-emerald-400 font-semibold text-xs px-3.5 h-8 shadow-sm">
+                <a href={COMPANION_DOWNLOAD_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5">
+                  <Download className="h-3.5 w-3.5" /> Download Companion App
+                </a>
+              </Button>
+            ) : null}
           </div>
         </Alert>
       )}

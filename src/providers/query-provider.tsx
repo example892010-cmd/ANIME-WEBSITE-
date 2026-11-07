@@ -2,6 +2,8 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { pb } from "@/lib/pocketbase";
+import { useAuthStore } from "@/store/auth-store";
 
 type Props = {
   children: ReactNode;
@@ -22,12 +24,13 @@ const QueryProvider = (props: Props) => {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
-      if (!localStorage.getItem("kitsune_v3_migrated")) {
-        console.log("Migration: Clearing legacy local storage watched records.");
-        localStorage.removeItem("watched");
-        localStorage.removeItem("serverPreference");
-        localStorage.setItem("kitsune_v3_migrated", "true");
-      }
+      // ANIFLIX is public and guest-only; clear legacy account sessions without
+      // touching locally saved watch progress or the visitor's My List.
+      pb.authStore.clear();
+      localStorage.removeItem("pocketbase_auth");
+      localStorage.removeItem("auth");
+      localStorage.removeItem("serverPreference");
+      useAuthStore.getState().clearAuth();
     }
   }, []);
 

@@ -199,7 +199,7 @@ func runPlatformTray(state *CompanionState, uiURL string) {
 	globalUIURL = uiURL
 
 	hInstance, _, _ := procGetModuleHandleW.Call(0)
-	className, _ := syscall.UTF16PtrFromString("KitsuneCompanionTrayClass")
+	className, _ := syscall.UTF16PtrFromString("AniflixCompanionTrayClass")
 	hIcon := loadEmbeddedTrayIcon()
 
 	wc := wndClassExW{
@@ -226,7 +226,7 @@ func runPlatformTray(state *CompanionState, uiURL string) {
 	nid.uFlags = nifMessage | nifIcon | nifTip
 	nid.uCallbackMessage = wmTrayIcon
 	nid.hIcon = hIcon
-	tip, _ := syscall.UTF16FromString("Kitsune Companion")
+	tip, _ := syscall.UTF16FromString("ANIFLIX Companion")
 	copy(nid.szTip[:], tip)
 
 	procShellNotifyIconW.Call(nimAdd, uintptr(unsafe.Pointer(&nid)))

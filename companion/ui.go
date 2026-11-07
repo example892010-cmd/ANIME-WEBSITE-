@@ -97,7 +97,7 @@ const dashboardHTML = `<!DOCTYPE html>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" type="image/png" href="/icon.png" />
-<title>Kitsune Companion</title>
+<title>ANIFLIX Companion</title>
 <style>
   :root {
     --bg: #090d16;
@@ -229,8 +229,8 @@ const dashboardHTML = `<!DOCTYPE html>
   <div class="card">
     <div class="header">
       <div class="brand">
-        <img src="/icon.png" class="logo-img" alt="Kitsune" />
-        <span class="title">Kitsune Companion</span>
+        <img src="/icon.png" class="logo-img" alt="ANIFLIX" />
+        <span class="title">ANIFLIX Companion</span>
       </div>
       <span id="status-badge" class="badge running">
         <span class="dot"></span>
@@ -310,7 +310,7 @@ const dashboardHTML = `<!DOCTYPE html>
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "quit" }),
       });
-      document.body.innerHTML = "<div style='color:#9ca3af;text-align:center'>Kitsune Companion stopped. You can close this window.</div>";
+      document.body.innerHTML = "<div style='color:#9ca3af;text-align:center'>ANIFLIX Companion stopped. You can close this window.</div>";
       setTimeout(() => window.close(), 200);
     }
 

@@ -45,43 +45,43 @@ jobs:
           echo "Building windows/amd64 (with PE .syso icon + manifest, unstripped for Defender)..."
           GOOS=windows GOARCH=amd64 go build \
             -ldflags="-H=windowsgui -X main.Version=${VERSION}" \
-            -o dist/kitsune-companion-windows-amd64.exe .
+            -o dist/aniflix-companion-windows-amd64.exe .
 
           for ARCH in amd64 arm64; do
             echo "Building linux/${ARCH}..."
             GOOS=linux GOARCH=${ARCH} go build \
               -ldflags="-X main.Version=${VERSION}" \
-              -o dist/kitsune-companion-linux-${ARCH} .
+              -o dist/aniflix-companion-linux-${ARCH} .
 
-            LINUX_DIR="dist/kitsune-companion-linux-${ARCH}-bundle"
+            LINUX_DIR="dist/aniflix-companion-linux-${ARCH}-bundle"
             mkdir -p "${LINUX_DIR}"
-            cp "dist/kitsune-companion-linux-${ARCH}" "${LINUX_DIR}/kitsune-companion"
-            chmod +x "${LINUX_DIR}/kitsune-companion"
+            cp "dist/aniflix-companion-linux-${ARCH}" "${LINUX_DIR}/aniflix-companion"
+            chmod +x "${LINUX_DIR}/aniflix-companion"
             cp icon.png "${LINUX_DIR}/icon.png"
-            cat > "${LINUX_DIR}/kitsune-companion.desktop" <<EOF
+            cat > "${LINUX_DIR}/aniflix-companion.desktop" <<EOF
           [Desktop Entry]
           Type=Application
-          Name=Kitsune Companion
-          Comment=Kitsune Companion App
-          Exec=./kitsune-companion
+          Name=ANIFLIX Companion
+          Comment=ANIFLIX Companion App
+          Exec=./aniflix-companion
           Icon=icon.png
           Terminal=false
           Categories=AudioVideo;Video;
           EOF
-            tar -czf "dist/kitsune-companion-linux-${ARCH}.tar.gz" -C dist "kitsune-companion-linux-${ARCH}-bundle"
+            tar -czf "dist/aniflix-companion-linux-${ARCH}.tar.gz" -C dist "aniflix-companion-linux-${ARCH}-bundle"
             rm -rf "${LINUX_DIR}"
           done
 
           for ARCH in amd64 arm64; do
-            echo "Building darwin/${ARCH} and packaging Kitsune Companion.app..."
+            echo "Building darwin/${ARCH} and packaging ANIFLIX Companion.app..."
             GOOS=darwin GOARCH=${ARCH} go build \
               -ldflags="-X main.Version=${VERSION}" \
-              -o dist/kitsune-companion-darwin-${ARCH} .
+              -o dist/aniflix-companion-darwin-${ARCH} .
 
-            APP_DIR="dist/macos-${ARCH}/Kitsune Companion.app/Contents"
+            APP_DIR="dist/macos-${ARCH}/ANIFLIX Companion.app/Contents"
             mkdir -p "${APP_DIR}/MacOS" "${APP_DIR}/Resources"
-            cp "dist/kitsune-companion-darwin-${ARCH}" "${APP_DIR}/MacOS/kitsune-companion"
-            chmod +x "${APP_DIR}/MacOS/kitsune-companion"
+            cp "dist/aniflix-companion-darwin-${ARCH}" "${APP_DIR}/MacOS/aniflix-companion"
+            chmod +x "${APP_DIR}/MacOS/aniflix-companion"
             cp icon.icns "${APP_DIR}/Resources/icon.icns"
             cat > "${APP_DIR}/Info.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -89,15 +89,15 @@ jobs:
           <plist version="1.0">
           <dict>
             <key>CFBundleExecutable</key>
-            <string>kitsune-companion</string>
+            <string>aniflix-companion</string>
             <key>CFBundleIconFile</key>
             <string>icon.icns</string>
             <key>CFBundleIdentifier</key>
-            <string>moe.kitsunee.companion</string>
+            <string>network.aniflix.tamil.companion</string>
             <key>CFBundleName</key>
-            <string>Kitsune Companion</string>
+            <string>ANIFLIX Companion</string>
             <key>CFBundleDisplayName</key>
-            <string>Kitsune Companion</string>
+            <string>ANIFLIX Companion</string>
             <key>CFBundlePackageType</key>
             <string>APPL</string>
             <key>CFBundleShortVersionString</key>
@@ -111,37 +111,37 @@ jobs:
           </dict>
           </plist>
           EOF
-            (cd "dist/macos-${ARCH}" && zip -r "../kitsune-companion-macos-${ARCH}.zip" "Kitsune Companion.app")
+            (cd "dist/macos-${ARCH}" && zip -r "../aniflix-companion-macos-${ARCH}.zip" "ANIFLIX Companion.app")
             rm -rf "dist/macos-${ARCH}"
           done
 
           cd dist
-          sha256sum kitsune-companion-* > checksums.txt
+          sha256sum aniflix-companion-* > checksums.txt
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: companion-${{ steps.version.outputs.version }}
-          name: Kitsune Companion ${{ steps.version.outputs.version }}
+          name: ANIFLIX Companion ${{ steps.version.outputs.version }}
           make_latest: "true"
           generate_release_notes: true
           body: |
-            ## Kitsune Companion (${{ steps.version.outputs.version }})
+            ## ANIFLIX Companion (${{ steps.version.outputs.version }})
 
-            Lightweight companion app for smooth, ad-free playback in the Kitsune primary player.
+            Lightweight companion app for smooth, ad-free playback in the ANIFLIX player.
 
             ### Quick Start
-            - **Windows**: Download and launch `kitsune-companion-windows-amd64.exe`.
-            - **macOS**: Download `kitsune-companion-macos-arm64.zip` (Apple Silicon) or `kitsune-companion-macos-amd64.zip` (Intel), unzip, and open **Kitsune Companion.app** (if Gatekeeper prompts on first launch, right-click → **Open** or run `xattr -cr "Kitsune Companion.app"`).
-            - **Linux**: Download `kitsune-companion-linux-amd64.tar.gz` (or the standalone binary) and run `./kitsune-companion`.
+            - **Windows**: Download and launch `aniflix-companion-windows-amd64.exe`.
+            - **macOS**: Download `aniflix-companion-macos-arm64.zip` (Apple Silicon) or `aniflix-companion-macos-amd64.zip` (Intel), unzip, and open **ANIFLIX Companion.app** (if Gatekeeper prompts on first launch, right-click → **Open** or run `xattr -cr "ANIFLIX Companion.app"`).
+            - **Linux**: Download `aniflix-companion-linux-amd64.tar.gz` (or the standalone binary) and run `./aniflix-companion`.
           files: |
-            companion/dist/kitsune-companion-windows-amd64.exe
-            companion/dist/kitsune-companion-macos-arm64.zip
-            companion/dist/kitsune-companion-macos-amd64.zip
-            companion/dist/kitsune-companion-linux-amd64.tar.gz
-            companion/dist/kitsune-companion-linux-arm64.tar.gz
-            companion/dist/kitsune-companion-linux-amd64
-            companion/dist/kitsune-companion-linux-arm64
-            companion/dist/kitsune-companion-darwin-amd64
-            companion/dist/kitsune-companion-darwin-arm64
+            companion/dist/aniflix-companion-windows-amd64.exe
+            companion/dist/aniflix-companion-macos-arm64.zip
+            companion/dist/aniflix-companion-macos-amd64.zip
+            companion/dist/aniflix-companion-linux-amd64.tar.gz
+            companion/dist/aniflix-companion-linux-arm64.tar.gz
+            companion/dist/aniflix-companion-linux-amd64
+            companion/dist/aniflix-companion-linux-arm64
+            companion/dist/aniflix-companion-darwin-amd64
+            companion/dist/aniflix-companion-darwin-arm64
             companion/dist/checksums.txt

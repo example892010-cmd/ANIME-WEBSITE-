@@ -11,7 +11,8 @@ import Container from "./container";
 import { Button } from "./ui/button";
 
 import React from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Play, Send } from "lucide-react";
+import Link from "next/link";
 
 import { ROUTES } from "@/constants/routes";
 import { ButtonLink } from "./common/button-link";
@@ -30,7 +31,7 @@ const HeroSection = (props: IHeroSectionProps) => {
     return <LoadingSkeleton />;
 
   return (
-    <div className="h-[80vh] w-full relative">
+    <div className="relative h-[72vh] min-h-[520px] w-full pt-16 sm:h-[76vh] sm:min-h-[580px]">
       <Carousel className="w-full" setApi={setApi} opts={{ loop: true }}>
         <CarouselContent>
           {props.spotlightAnime.map((anime, index) => (
@@ -71,18 +72,18 @@ const HeroCarouselItem = ({ anime }: { anime: MediaList }) => {
 
   return (
     <div
-      className="w-full bg-cover bg-no-repeat bg-center h-[80vh] relative"
+      className="relative h-[72vh] min-h-[520px] w-full bg-cover bg-center bg-no-repeat sm:h-[76vh] sm:min-h-[580px]"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       {/* Gradient Overlay */}
-      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-r from-slate-950/55 via-slate-950/25 to-transparent z-10"></div>
-      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-t from-slate-950/35 via-slate-950/10 to-transparent z-10"></div>
+      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-r from-slate-950/40 via-slate-950/15 to-transparent z-10"></div>
+      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-t from-slate-950/25 via-slate-950/5 to-transparent z-10"></div>
 
       {/* Content Section */}
       <div className="w-full h-[calc(100%-5.25rem)] relative z-20">
         <Container className="w-full h-full flex flex-col justify-end md:justify-center pb-10">
-          <div className="space-y-3 lg:w-[45vw]">
-            <h1 className="text-3xl md:text-5xl font-black text-white line-clamp-2">
+          <div className="space-y-3 rounded-2xl border border-white/10 bg-slate-950/25 p-4 backdrop-blur-[2px] sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-0 lg:w-[45vw]">
+            <h1 className="text-3xl font-black text-white drop-shadow-lg line-clamp-2 sm:text-5xl">
               {title}
             </h1>
 
@@ -109,14 +110,12 @@ const HeroCarouselItem = ({ anime }: { anime: MediaList }) => {
               ))}
             </div>
 
-            <div className="flex items-center gap-5 !mt-6">
-              <ButtonLink
-                href={`${ROUTES.ANIME_DETAILS}/${anime.id}`}
-                className="h-10 text-md bg-[#e9376b] text-white hover:bg-[#e9376b]"
-              >
-                Learn More
-              </ButtonLink>
+            {anime.description && <p className="line-clamp-3 max-w-xl text-sm leading-6 text-slate-200 drop-shadow">{anime.description}</p>}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <ButtonLink href={`${ROUTES.ANIME_DETAILS}/${anime.id}`} className="h-11 rounded-full bg-emerald-400 px-5 text-sm font-black text-slate-950 hover:bg-emerald-300"><Play className="mr-2 h-4 w-4 fill-current" /> Explore Anime</ButtonLink>
+              <Link href="https://t.me/+98iAagsDsjI5NDk1" target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/30 bg-slate-950/35 px-5 text-sm font-bold text-white backdrop-blur hover:border-emerald-300"><Send className="h-4 w-4" /> Join Telegram</Link>
             </div>
+            <p className="text-xs font-semibold text-emerald-200">Tamil audio updates · Free to browse · No login required</p>
           </div>
         </Container>
       </div>
@@ -126,7 +125,7 @@ const HeroCarouselItem = ({ anime }: { anime: MediaList }) => {
 
 const LoadingSkeleton = () => {
   return (
-    <div className="h-[80vh] w-full relative">
+    <div className="relative h-[72vh] min-h-[520px] w-full pt-16 sm:h-[76vh] sm:min-h-[580px]">
       <div className="w-full h-[calc(100%-5.25rem)] mt-[5.25rem] relative z-20">
         <Container className="w-full h-full flex flex-col justify-end md:justify-center pb-10">
           <div className="space-y-2 lg:w-[40vw]">

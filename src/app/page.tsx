@@ -20,6 +20,8 @@ const AnimeSections = dynamic(() => import("@/components/anime-sections"));
 import React, { useState, useMemo } from "react";
 
 import RecentCommentsSection from "@/components/recent-comments-section";
+import TelegramBanner from "@/components/telegram-banner";
+import CustomAnimeSection from "@/components/custom-anime-section";
 
 export default function Home() {
   const [trendingPage, setTrendingPage] = useState(1);
@@ -55,11 +57,14 @@ export default function Home() {
   );
 
   return (
-    <div className="flex flex-col bg-[#121212]">
+    <div className="aniflix-surface flex flex-col">
       <HeroSection
         spotlightAnime={spotlightList}
         isDataLoading={isLoadingSpotlight}
       />
+
+      <TelegramBanner />
+      <CustomAnimeSection />
 
       <LatestEpisodesAnime loading={isLoadingRecent} />
 

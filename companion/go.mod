@@ -1,3 +1,3 @@
-module kitsune-companion
+module aniflix-companion
 
 go 1.22

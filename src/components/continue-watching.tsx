@@ -8,7 +8,6 @@ import BlurFade from "./ui/blur-fade";
 import { IAnime } from "@/types/anime";
 import { History } from "lucide-react";
 import useBookMarks, { WatchHistory } from "@/hooks/use-get-bookmark";
-import { useAuthStore } from "@/store/auth-store";
 
 type Props = {
   loading: boolean;
@@ -21,7 +20,6 @@ interface WatchedAnime extends IAnime {
 const ContinueWatching = (props: Props) => {
   const [anime, setAnime] = useState<WatchedAnime[] | null>(null);
 
-  const { auth } = useAuthStore();
   const { bookmarks } = useBookMarks({
     page: 1,
     per_page: 14,
@@ -29,48 +27,22 @@ const ContinueWatching = (props: Props) => {
   });
 
   useEffect(() => {
-    if (!auth) {
-      if (typeof window !== "undefined") {
-        const storedData = localStorage.getItem("watched");
-        const watchedAnimes: {
-          anime: { id: string; title: string; poster: string };
-          episodes: string[];
-        }[] = storedData ? JSON.parse(storedData) : [];
-
-        if (!Array.isArray(watchedAnimes)) {
-          localStorage.removeItem("watched");
-          return;
-        }
-
-        const animes = watchedAnimes.reverse().map((anime) => ({
-          id: anime.anime.id,
-          name: anime.anime.title,
-          poster: anime.anime.poster,
-          episode: anime.episodes[anime.episodes.length - 1],
-        }));
-        setAnime(animes as WatchedAnime[]);
-      }
+    if (bookmarks && bookmarks.length > 0) {
+      const animes = bookmarks
+        .map((item) => ({
+          id: item.animeId,
+          name: item.animeTitle,
+          poster: item.thumbnail,
+          episode: item.expand?.watchHistory
+            ? [...item.expand.watchHistory].sort((a, b) => b.episodeNumber - a.episodeNumber)[0]
+            : null,
+        }))
+        .filter((item) => !!item.episode);
+      setAnime(animes.length > 0 ? (animes as WatchedAnime[]) : null);
     } else {
-      if (bookmarks && bookmarks.length > 0) {
-        const animes = bookmarks
-          .map((anime) => ({
-            id: anime.animeId,
-            name: anime.animeTitle,
-            poster: anime.thumbnail,
-            episode: anime.expand?.watchHistory
-              ? anime.expand.watchHistory.sort(
-                  (a, b) => b.episodeNumber - a.episodeNumber,
-                )[0]
-              : null,
-          }))
-          .filter((item) => !!item.episode);
-
-        setAnime(animes.length > 0 ? (animes as WatchedAnime[]) : null);
-      } else {
-        setAnime(null);
-      }
+      setAnime(null);
     }
-  }, [auth, bookmarks]);
+  }, [bookmarks]);
 
   if (props.loading) return <LoadingSkeleton />;
 

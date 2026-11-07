@@ -1,22 +1,32 @@
 services:
-  kitsune:
+  aniflix:
     build:
       context: .
       dockerfile: Dockerfile
-    image: kitsune:latest
-    container_name: kitsune
+      args:
+        NEXT_PUBLIC_POCKETBASE_URL: ${NEXT_PUBLIC_POCKETBASE_URL}
+    image: aniflix-network-tamil:latest
+    container_name: aniflix-network-tamil
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_POCKETBASE_URL=http://localhost:8090
+      - POCKETBASE_URL=${POCKETBASE_URL}
+      - NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL}
+      - PB_SUPERUSER_EMAIL=${PB_SUPERUSER_EMAIL}
+      - PB_SUPERUSER_PASSWORD=${PB_SUPERUSER_PASSWORD}
+      - ADMIN_INITIAL_PASSWORD=${ADMIN_INITIAL_PASSWORD}
+      - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET}
+      - ADMIN_RECOVERY_CODE=${ADMIN_RECOVERY_CODE}
+      - TELEGRAM_ADMIN_BOT_SECRET=${TELEGRAM_ADMIN_BOT_SECRET}
       - REDIS_URL=redis://redis:6379
+      - DOMAIN_URL=${DOMAIN_URL}
     depends_on:
       - redis
 
   redis:
     image: redis:8-alpine
-    container_name: kitsune-redis
+    container_name: aniflix-redis
     restart: unless-stopped
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save "" --appendonly no
     ports:

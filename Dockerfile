@@ -8,8 +8,8 @@ RUN apk add --no-cache libc6-compat git
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json ./
-RUN  npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # 2. Rebuild the source code only when needed
 FROM base AS builder
@@ -17,6 +17,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Next.js inlines NEXT_PUBLIC_* variables into browser bundles at build time.
+ARG NEXT_PUBLIC_POCKETBASE_URL
+ENV NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL}
 ENV NODE_ENV=production
 
 RUN npm run build
@@ -25,9 +28,9 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-LABEL org.opencontainers.image.title="Kitsune" \
-  org.opencontainers.image.source="https://github.com/dovakiin0/Kitsune.git" \
-  org.opencontainers.image.vendor="kitsunee.moe"
+LABEL org.opencontainers.image.title="ANIFLIX NETWORK TAMIL" \
+  org.opencontainers.image.description="ANIFLIX NETWORK TAMIL anime streaming web app" \
+  org.opencontainers.image.vendor="ANIFLIX NETWORK TAMIL"
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001

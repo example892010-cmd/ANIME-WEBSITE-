@@ -243,7 +243,7 @@ class LightweightRedisClient {
 const redisClient = new LightweightRedisClient();
 
 export async function redisGet(key: string): Promise<string | null> {
-  const res = await redisClient.exec(["GET", `kitsune:${key}`]);
+  const res = await redisClient.exec(["GET", `aniflix:${key}`]);
   return typeof res === "string" ? res : null;
 }
 
@@ -253,19 +253,19 @@ export async function redisSet(
   ttlMs: number,
 ): Promise<boolean> {
   const px = Math.max(1000, Math.ceil(ttlMs));
-  const res = await redisClient.exec(["SET", `kitsune:${key}`, value, "PX", px]);
+  const res = await redisClient.exec(["SET", `aniflix:${key}`, value, "PX", px]);
   return res === "OK";
 }
 
 export async function redisDel(...keys: string[]): Promise<void> {
   if (!keys.length) return;
-  await redisClient.exec(["DEL", ...keys.map((k) => `kitsune:${k}`)]);
+  await redisClient.exec(["DEL", ...keys.map((k) => `aniflix:${k}`)]);
 }
 
 export async function redisKeys(pattern: string): Promise<string[]> {
-  const res = await redisClient.exec(["KEYS", `kitsune:${pattern}`]);
+  const res = await redisClient.exec(["KEYS", `aniflix:${pattern}`]);
   if (!Array.isArray(res)) return [];
-  return res.map((k: string) => String(k).replace(/^kitsune:/, ""));
+  return res.map((k: string) => String(k).replace(/^aniflix:/, ""));
 }
 
 export function isRedisConfigured(): boolean {

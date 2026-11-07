@@ -27,7 +27,6 @@ import {
 import { useParams } from "next/navigation";
 import { useGetAnimeDetails } from "@/query/get-anime-details";
 import Loading from "@/app/loading";
-import { useAuthStore } from "@/store/auth-store";
 import { toast } from "sonner";
 import useBookMarks from "@/hooks/use-get-bookmark";
 
@@ -62,7 +61,6 @@ const SelectOptions: ISelectOptions[] = [
 const Page = () => {
   const { slug } = useParams();
   const { data: anime, isLoading } = useGetAnimeDetails(slug as string);
-  const { auth } = useAuthStore();
   const { bookmarks, createOrUpdateBookMark } = useBookMarks({
     animeID: slug as string,
     page: 1,
@@ -86,9 +84,6 @@ const Page = () => {
   }, [bookmarks, selected]);
 
   const handleSelect = async (value: string) => {
-    if (!auth) {
-      return;
-    }
     const previousSelected = selected;
     setSelected(value);
 
@@ -143,15 +138,13 @@ const Page = () => {
             </h1>
             <div className="flex items-center gap-5">
               <WatchButton />
-              {auth && (
-                <Select
-                  placeholder="Add to list"
-                  value={selected || normalizeStatus(bookmarks?.[0]?.status)}
-                  options={SelectOptions}
-                  onChange={handleSelect}
-                  placeholderIcon={Heart}
-                />
-              )}
+              <Select
+                placeholder="Add to list"
+                value={selected || normalizeStatus(bookmarks?.[0]?.status)}
+                options={SelectOptions}
+                onChange={handleSelect}
+                placeholderIcon={Heart}
+              />
             </div>
           </div>
         </div>

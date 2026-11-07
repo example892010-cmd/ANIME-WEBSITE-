@@ -84,7 +84,7 @@ body {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #000;
+  background: #061312;
 }
 
 /* Handle */
@@ -117,3 +117,11 @@ body {
   stroke: #555;
   stroke-width: 1px;
 }
+
+
+/* ANIFLIX NETWORK TAMIL visual system */
+html { scroll-behavior: smooth; }
+body { background: #061312; color: #f8fafc; }
+::selection { background: rgba(52, 211, 153, .35); color: #fff; }
+.aniflix-surface { background: radial-gradient(ellipse at 12% 5%, rgba(16,185,129,.13), transparent 32%), radial-gradient(ellipse at 88% 20%, rgba(14,165,233,.09), transparent 30%), #061312; }
+@media (max-width: 767px) { body { padding-bottom: 3.6rem; } }

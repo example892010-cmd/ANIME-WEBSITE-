@@ -26,6 +26,7 @@ import useBookMarks from "@/hooks/use-get-bookmark";
 import { toast } from "sonner";
 import { useGetAllEpisodes } from "@/query/get-all-episodes";
 import CommentsSection from "@/components/comments/comments-section";
+import AnimeBackdrop from "@/components/anime-backdrop";
 
 type Props = {
   children: ReactNode;
@@ -159,7 +160,9 @@ const Layout = (props: Props) => {
 
   return (
     anime?.anime.info && (
-      <Container className="mt-[6.5rem] space-y-10 pb-20">
+      <div className="relative isolate min-h-screen overflow-hidden bg-[#061312] text-white">
+      <AnimeBackdrop />
+      <Container className="relative z-10 mt-[6.5rem] space-y-10 pb-20">
         <div className="grid lg:grid-cols-4 grid-cols-1 gap-y-5 gap-x-10 h-auto w-full">
           <div className="lg:col-span-3 col-span-1 lg:mb-0">
             {props.children}
@@ -218,6 +221,7 @@ const Layout = (props: Props) => {
           anime={anime?.recommendedAnimes as IAnime[]}
         />
       </Container>
+      </div>
     )
   );
 };

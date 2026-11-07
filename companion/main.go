@@ -128,7 +128,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("Kitsune Companion v%s listening on http://%s (UI: http://%s/ui)", Version, addr, addr)
+		log.Printf("ANIFLIX Companion v%s listening on http://%s (UI: http://%s/ui)", Version, addr, addr)
 		if err := srv.Serve(ln); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("HTTP server error: %v", err)
 		}

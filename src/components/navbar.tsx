@@ -2,155 +2,38 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
-
-import Container from "./container";
-import { Separator } from "./ui/separator";
-
-import { nightTokyo } from "@/utils/fonts";
-import { ROUTES } from "@/constants/routes";
-import React, { ReactNode, useEffect, useState } from "react";
-
 import SearchBar from "./search-bar";
-import { MenuIcon, X } from "lucide-react";
-import useScrollPosition from "@/hooks/use-scroll-position";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "./ui/sheet";
-import LoginPopoverButton from "./login-popover-button";
-import { useAuthStore } from "@/store/auth-store";
-import { pb } from "@/lib/pocketbase";
-import NavbarAvatar from "./navbar-avatar";
-import { toast } from "sonner";
+import { Menu, Send, Settings, X, Home, Compass, Bookmark, Film } from "lucide-react";
+import { useState } from "react";
 
-const menuItems: Array<{ title: string; href?: string }> = [
-  // {
-  //   title: "Home",
-  //   href: ROUTES.HOME,
-  // },
-  // {
-  //   title: "Catalog",
-  // },
-  // {
-  //   title: "News",
-  // },
-  // {
-  //   title: "Collection",
-  // },
+const TELEGRAM_URL = "https://t.me/+98iAagsDsjI5NDk1";
+const links = [
+  { label: "Home", href: "/", icon: Home },
+  { label: "Discover", href: "/search", icon: Compass },
+  { label: "Anime", href: "/search", icon: Film },
+  { label: "My List", href: "/my-list", icon: Bookmark },
+  { label: "Profile", href: "/profile", icon: Home },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
-const NavBar = () => {
-  const auth = useAuthStore();
-  const { y } = useScrollPosition();
-  const isHeaderSticky = y > 0;
-
-  useEffect(() => {
-    const refreshAuth = async () => {
-      const auth_token = JSON.parse(
-        localStorage.getItem("pocketbase_auth") as string,
-      );
-      if (auth_token) {
-        try {
-          const user = await pb.collection("users").authRefresh();
-          if (user) {
-            auth.setAuth({
-              id: user.record.id,
-              email: user.record.email,
-              username: user.record.username,
-              avatar: user.record.avatar,
-              collectionId: user.record.collectionId,
-              collectionName: user.record.collectionName,
-              autoSkip: user.record.autoSkip,
-              created: user.record.created,
-            });
-          }
-        } catch (e) {
-          console.error("Auth refresh error:", e);
-          localStorage.removeItem("pocketbase_auth");
-          auth.clearAuth();
-          toast.error("Login session expired.", {
-            style: { background: "red" },
-          });
-        }
-      }
-    };
-    refreshAuth();
-  }, []);
-
+export default function NavBar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
   return (
-    <div
-      className={cn([
-        "fixed top-0 left-0 right-0 h-fit w-full z-[100] transition-all duration-300",
-        "backdrop-blur-xl backdrop-saturate-150 border-b",
-        isHeaderSticky
-          ? "bg-[#101014]/90 border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
-          : "bg-[#101014]/75 border-white/5",
-      ])}
-    >
-      <Container className="flex items-center justify-between py-2 gap-20 ">
-        <Link
-          href={ROUTES.HOME}
-          className="flex items-center gap-1 cursor-pointer"
-        >
-          <Image src="/aniflix-logo.png" alt="ANIFLIX NETWORK TAMIL" width={66} height={66} priority className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover" />
-          <h1
-            className={cn([
-              nightTokyo.className,
-              "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-pink-600 tracking-widest",
-            ])}
-          ><span className="max-w-[190px] text-sm sm:text-base font-extrabold tracking-wide leading-tight text-white">ANIFLIX <span className="text-emerald-400">NETWORK TAMIL</span></span></h1>
-        </Link>
-
-        <div className="hidden lg:flex items-center gap-10 ml-20">
-          {menuItems.map((menu, idx) => (
-            <Link href={menu.href || "#"} key={idx}>
-              {menu.title}
-            </Link>
-          ))}
+    <>
+      <header className="fixed inset-x-0 top-0 z-[100] border-b border-emerald-400/15 bg-[#041211]/90 shadow-[0_8px_30px_rgba(0,0,0,.25)] backdrop-blur-2xl">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5">
+            <Image src="/aniflix-logo.png" alt="ANIFLIX NETWORK TAMIL" width={58} height={58} priority className="h-11 w-11 rounded-full border border-emerald-300/40 object-cover sm:h-12 sm:w-12" />
+            <span className="leading-none"><span className="block text-lg font-black italic tracking-wide text-white sm:text-xl">ANIFLIX</span><span className="mt-1 block text-[10px] font-black tracking-[.16em] text-emerald-300 sm:text-xs">NETWORK TAMIL</span></span>
+          </Link>
+          <nav className="hidden items-center gap-5 xl:flex">{links.map((link) => <Link key={link.label} href={link.href} className="text-sm font-semibold text-slate-300 transition hover:text-emerald-300">{link.label}</Link>)}</nav>
+          <div className="hidden min-w-0 flex-1 items-center justify-end gap-3 lg:flex"><div className="w-full max-w-sm"><SearchBar /></div><Link href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-sky-500 px-4 py-2.5 text-xs font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-400"><Send className="h-4 w-4" /> Join Telegram</Link><Link href="/settings" aria-label="Settings" className="rounded-full border border-white/10 p-2.5 text-slate-200 hover:border-emerald-400/40 hover:text-emerald-300"><Settings className="h-4 w-4" /></Link></div>
+          <div className="flex items-center gap-2 lg:hidden"><Link href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Join Telegram" className="grid h-10 w-10 place-items-center rounded-full bg-sky-500 text-white"><Send className="h-4 w-4" /></Link><button onClick={() => setMobileOpen((open) => !open)} aria-label={mobileOpen ? "Close menu" : "Open menu"} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white">{mobileOpen ? <X /> : <Menu />}</button></div>
         </div>
-        <div className="w-1/3 hidden lg:flex items-center gap-5">
-          <SearchBar />
-          {auth.auth ? <NavbarAvatar auth={auth} /> : <LoginPopoverButton />}
-        </div>
-        <div className="lg:hidden flex items-center gap-5">
-          <MobileMenuSheet trigger={<MenuIcon suppressHydrationWarning />} />
-          {auth.auth ? <NavbarAvatar auth={auth} /> : <LoginPopoverButton />}
-        </div>
-      </Container>
-    </div>
+        {mobileOpen && <div className="border-t border-white/10 bg-[#061614] px-4 pb-5 pt-4 lg:hidden"><div className="mb-4"><SearchBar onAnimeClick={() => setMobileOpen(false)} /></div><div className="grid grid-cols-2 gap-2">{links.map(({ label, href, icon: Icon }) => <Link key={label} href={href} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[.04] px-3 py-3 text-sm font-semibold text-slate-200"><Icon className="h-4 w-4 text-emerald-300" />{label}</Link>)}</div><Link href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-sky-500 py-3 text-sm font-black"><Send className="h-4 w-4" /> Join Telegram Channel</Link></div>}
+      </header>
+      <div className="pointer-events-none fixed bottom-4 right-4 z-[90] hidden sm:block"><Link href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Join ANIFLIX Telegram" className="pointer-events-auto grid h-12 w-12 place-items-center rounded-full bg-sky-500 text-white shadow-[0_8px_24px_rgba(14,165,233,.35)] transition hover:scale-105"><Send className="h-5 w-5" /></Link></div>
+      <nav className="fixed inset-x-0 bottom-0 z-[100] grid grid-cols-4 border-t border-emerald-400/20 bg-[#041211]/95 py-2 backdrop-blur-xl md:hidden">{[{label:"Home",href:"/",icon:Home},{label:"Discover",href:"/search",icon:Compass},{label:"My List",href:"/my-list",icon:Bookmark},{label:"Profile",href:"/profile",icon:Home}].map(({label,href,icon:Icon}) => <Link key={label} href={href} className="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-300"><Icon className="h-5 w-5 text-emerald-300" />{label}</Link>)}</nav>
+    </>
   );
-};
-
-const MobileMenuSheet = ({ trigger }: { trigger: ReactNode }) => {
-  const [open, setOpen] = useState<boolean>(false);
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>{trigger}</SheetTrigger>
-      <SheetContent
-        className="flex flex-col w-[80vw] z-[150]"
-        hideCloseButton
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <div className="w-full h-full relative">
-          <SheetClose className="absolute top-0 right-0">
-            <X />
-          </SheetClose>
-          <div className="flex flex-col gap-5 mt-10">
-            {menuItems.map((menu, idx) => (
-              <Link
-                href={menu.href || "#"}
-                key={idx}
-                onClick={() => setOpen(false)}
-              >
-                {menu.title}
-              </Link>
-            ))}
-            <Separator />
-            <SearchBar onAnimeClick={() => setOpen(false)} />
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-};
-
-export default NavBar;
+}

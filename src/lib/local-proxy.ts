@@ -5,7 +5,7 @@ export const COMPANION_UI_URL = `${LOCAL_PROXY_BASE_URL}/ui`;
 
 export const COMPANION_DOWNLOAD_URL =
   process.env.NEXT_PUBLIC_COMPANION_RELEASE_URL ||
-  "https://github.com/dovakiin0/Kitsune/releases/latest";
+  "";
 
 let cachedStatus: { active: boolean; checkedAt: number } | null = null;
 let inflightProbe: Promise<boolean> | null = null;

@@ -24,7 +24,7 @@ const geistSans = localFont({
 
 const APP_NAME = "ANIFLIX NETWORK TAMIL";
 const APP_DEFAULT_TITLE = "ANIFLIX NETWORK TAMIL | Anime";
-const APP_DESCRIPTION = "ANIFLIX NETWORK TAMIL - Discover anime, explore releases and manage your watchlist.";
+const APP_DESCRIPTION = "ANIFLIX NETWORK TAMIL - Discover anime, enjoy Tamil audio releases and explore anime for free. No login required.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

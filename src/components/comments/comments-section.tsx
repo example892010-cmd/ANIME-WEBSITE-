@@ -2,12 +2,10 @@
 
 import React, { useState } from "react";
 import { MessageSquare, AlertTriangle, Send, Eye, EyeOff, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { useAuthStore } from "@/store/auth-store";
-import { useGetInfiniteComments, useAddComment } from "@/hooks/use-comments";
+import { useGetInfiniteComments } from "@/hooks/use-comments";
 import Avatar from "@/components/common/avatar";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
-import LoginPopoverButton from "@/components/login-popover-button";
 
 type Props = {
   animeId: string;
@@ -16,10 +14,7 @@ type Props = {
 };
 
 const CommentsSection = ({ animeId, animeTitle, episodeNumber }: Props) => {
-  const { auth } = useAuthStore();
   const [isOpen, setIsOpen] = useState(true);
-  const [content, setContent] = useState("");
-  const [spoil, setSpoil] = useState(false);
   const [revealedSpoilers, setRevealedSpoilers] = useState<Record<string, boolean>>({});
 
   const {
@@ -33,27 +28,6 @@ const CommentsSection = ({ animeId, animeTitle, episodeNumber }: Props) => {
     episodeNumber,
     perPage: 10,
   });
-
-  const addCommentMutation = useAddComment();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-
-    try {
-      await addCommentMutation.mutateAsync({
-        content: content.trim(),
-        animeId,
-        animeTitle,
-        episodeNumber,
-        spoil,
-      });
-      setContent("");
-      setSpoil(false);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const toggleSpoiler = (id: string) => {
     setRevealedSpoilers((prev) => ({
@@ -94,47 +68,7 @@ const CommentsSection = ({ animeId, animeTitle, episodeNumber }: Props) => {
       {/* Collapsible Content */}
       {isOpen && (
         <div className="flex flex-col gap-6 pt-2">
-          {/* Post Comment Input Form */}
-          {auth ? (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 bg-[#0f172a] p-4 rounded-xl border border-slate-800 shadow-sm">
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Share your thoughts about this episode..."
-                rows={3}
-                className="w-full bg-slate-900/90 text-white placeholder-gray-500 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#e9376b] border border-slate-800 transition resize-none"
-              />
-
-              <div className="flex items-center justify-between">
-                <label htmlFor="spoil-checkbox" className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer select-none">
-                  <input
-                    id="spoil-checkbox"
-                    type="checkbox"
-                    checked={spoil}
-                    onChange={(e) => setSpoil(e.target.checked)}
-                    className="h-4 w-4 rounded bg-slate-900 border-slate-700 text-[#e9376b] focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#e9376b]"
-                  />
-                  <span className="flex items-center gap-1">
-                    <AlertTriangle className="h-3.5 w-3.5 text-yellow-500" /> Contains Spoilers
-                  </span>
-                </label>
-
-                <Button
-                  type="submit"
-                  disabled={addCommentMutation.isPending || !content.trim()}
-                  className="bg-[#e9376b] hover:bg-[#e9376b]/90 text-white text-xs font-bold px-4 h-8 rounded-lg flex items-center gap-1.5 transition disabled:opacity-50"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  {addCommentMutation.isPending ? "Posting..." : "Post Comment"}
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-[#0f172a] rounded-xl border border-slate-800 text-sm">
-              <p className="text-gray-400 text-xs sm:text-sm">Join the discussion! Log in to share comments with the community.</p>
-              <LoginPopoverButton />
-            </div>
-          )}
+          <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/5 p-3 text-xs text-slate-300">You can read episode comments without an account. Public account login and registration are disabled on ANIFLIX.</div>
 
           {/* Comment List */}
           {isLoading ? (

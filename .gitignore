@@ -26,6 +26,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
+.env.*
+!.env.example
 .env*.local
 
 # vercel
@@ -47,7 +50,7 @@ GEMINI.md
 specs/
 **/.cache/
 companion/dist/
-companion/kitsune-companion*
+companion/aniflix-companion*
 companion/*.syso
 companion/*.icns
 *.exe
