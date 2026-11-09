@@ -30,9 +30,12 @@ const AnimeSections = ({
 }: Props) => {
   if (loading || !animeList?.length) return <LoadingSkeleton />;
   return (
-    <Container className="flex flex-col gap-5 py-10 items-center lg:items-start ">
-      <h5 className="text-2xl font-bold text-white">{sectionTitle}</h5>
-      <div className="grid lg:grid-cols-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 w-full gap-5 content-center">
+    <Container className="flex w-full flex-col items-start gap-5 py-7">
+      <div className="flex w-full items-center justify-between">
+        <h5 className="border-l-4 border-red-600 pl-3 text-xl font-extrabold text-white sm:text-2xl">{sectionTitle}</h5>
+        <span className="text-xs font-semibold text-slate-300 sm:text-sm">View All <span aria-hidden="true">→</span></span>
+      </div>
+      <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:thin] [scrollbar-color:#475569_transparent]">
         {animeList.map((anime, idx) => {
           const title =
             anime.title?.english || anime.title?.romaji || anime.title?.native || "Untitled";
@@ -41,14 +44,17 @@ const AnimeSections = ({
 
           return (
             <BlurFade key={`${anime.id}-${idx}`} delay={idx * 0.03} inView>
+              <div className="w-[170px] shrink-0 snap-start sm:w-[185px] lg:w-[205px]">
               <AnimeCard
                 title={title}
                 format={anime.format}
                 score={anime.averageScore}
                 poster={poster}
-                className="self-center justify-self-center"
+                className="!h-[250px] !w-full !max-w-none !min-w-0"
+                variant="lg"
                 href={`${ROUTES.ANIME_DETAILS}/${anime.id}`}
               />
+              </div>
             </BlurFade>
           );
         })}
@@ -77,14 +83,14 @@ const AnimeSections = ({
 
 const LoadingSkeleton = () => {
   return (
-    <Container className="flex flex-col gap-5 py-10 items-center lg:items-start ">
-      <div className="h-10 w-[15.625rem] animate-pulse bg-slate-700"></div>
-      <div className="grid lg:grid-cols-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 w-full gap-5 content-center">
+    <Container className="flex w-full flex-col items-start gap-5 py-7">
+      <div className="h-8 w-52 animate-pulse rounded bg-slate-700"></div>
+      <div className="flex w-full gap-4 overflow-hidden">
         {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, idx) => {
           return (
             <div
               key={idx}
-              className="rounded-xl h-[15.625rem] min-w-[10.625rem] max-w-[12.625rem] md:h-[18.75rem] md:max-w-[12.5rem] animate-pulse bg-slate-700"
+              className="h-[15.625rem] w-[145px] shrink-0 animate-pulse rounded-xl bg-slate-700 sm:w-[180px] md:h-[18.75rem]"
             ></div>
           );
         })}

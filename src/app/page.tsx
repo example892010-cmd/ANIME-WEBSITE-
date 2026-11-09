@@ -63,33 +63,8 @@ export default function Home() {
         isDataLoading={isLoadingSpotlight}
       />
 
-      <TelegramBanner />
-      <CustomAnimeSection />
-
-      <LatestEpisodesAnime loading={isLoadingRecent} />
-
-      <ContinueWatching loading={false} />
-
-      <FeaturedCollection
-        loading={isLoadingPopular || isLoadingRecent}
-        featuredAnime={[
-          {
-            title: "Most Favorite Anime",
-            anime: featuredFavoriteList,
-          },
-          {
-            title: "Most Popular Anime",
-            anime: featuredPopularList,
-          },
-          {
-            title: "Recent Completed Anime",
-            anime: featuredRecentList,
-          },
-        ]}
-      />
-
       <AnimeSections
-        title="Trending Anime"
+        title="Trending Now"
         animeList={trendingList}
         loading={isLoadingTrending}
         page={trendingPage}
@@ -97,12 +72,31 @@ export default function Home() {
         onPageChange={(p) => setTrendingPage(p)}
       />
 
-      <RecentCommentsSection />
+      <AnimeSections
+        title="Popular Anime"
+        animeList={popularList}
+        loading={isLoadingPopular}
+      />
 
+      <LatestEpisodesAnime loading={isLoadingRecent} />
+      <ContinueWatching loading={false} />
+
+      <FeaturedCollection
+        loading={isLoadingPopular || isLoadingRecent}
+        featuredAnime={[
+          { title: "Most Favorite Anime", anime: featuredFavoriteList },
+          { title: "Most Popular Anime", anime: featuredPopularList },
+          { title: "Recent Completed Anime", anime: featuredRecentList },
+        ]}
+      />
+
+      <CustomAnimeSection />
+      <TelegramBanner />
+      <RecentCommentsSection />
       <AnimeSchedule />
 
       <AnimeSections
-        title="Upcoming Animes"
+        title="Upcoming Anime"
         animeList={upcomingList}
         loading={isLoadingUpcoming}
         page={upcomingPage}
