@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { useGetAllEpisodes } from "@/query/get-all-episodes";
 import useBookMarks from "@/hooks/use-get-bookmark";
@@ -97,6 +98,7 @@ const VideoPlayerSection = () => {
 
   const [autoSkip, setAutoSkip] = useState<boolean>(true);
   const [preferredCategory, setPreferredCategory] = useState<"sub" | "dub">("sub");
+  const [selectedAudioLanguage, setSelectedAudioLanguage] = useState<string>("");
 
   const { createOrUpdateBookMark, syncWatchProgress } = useBookMarks({
     animeID: animeIdParam,
@@ -406,6 +408,7 @@ const VideoPlayerSection = () => {
             image: anime?.anime?.info?.poster || "",
           }}
           subOrDub={activeCategory}
+          targetAudioLanguage={selectedAudioLanguage}
           autoSkip={autoSkip}
           onError={tryNextProviderOrFallback}
         />
@@ -449,13 +452,46 @@ const VideoPlayerSection = () => {
               <p className="font-bold text-xs text-gray-300 tracking-wider">
                 SERVERS (DUB):
               </p>
-              {dubProvidersForEp.map((pName) => {
+              {dubProvidersForEp.flatMap((pName) => {
+                if (pName.toLowerCase() === "animeworld") {
+                  const verifiedLangs = episodeData?.languages && episodeData.languages.length > 0
+                    ? episodeData.languages
+                    : ["multi-audio"];
+
+                  return verifiedLangs.map((lang) => {
+                    const label = `AnimeWorld (${lang.charAt(0).toUpperCase() + lang.slice(1)})`;
+                    const isLangActive =
+                      !isFallbackActive &&
+                      currentProviderName.toLowerCase() === "animeworld" &&
+                      activeCategory === "dub" &&
+                      (!selectedAudioLanguage || selectedAudioLanguage.toLowerCase() === lang.toLowerCase());
+
+                    return (
+                      <Button
+                        size="sm"
+                        key={`dub-animeworld-${lang}`}
+                        className={`font-bold text-xs px-3 transition-all ${
+                          isLangActive
+                            ? "bg-emerald-500 text-slate-950 shadow-md ring-2 ring-emerald-400/40 scale-105"
+                            : "bg-slate-800/80 text-gray-300 hover:bg-slate-700 hover:text-white"
+                        }`}
+                        onClick={() => {
+                          setSelectedAudioLanguage(lang === "multi-audio" ? "" : lang);
+                          handleProviderSelect(pName, "dub");
+                        }}
+                      >
+                        {label}
+                      </Button>
+                    );
+                  });
+                }
+
                 const isActive =
                   !isFallbackActive &&
                   currentProviderName.toLowerCase() === pName.toLowerCase() &&
                   activeCategory === "dub";
 
-                return (
+                return [(
                   <Button
                     size="sm"
                     key={`dub-${pName}`}
@@ -464,17 +500,57 @@ const VideoPlayerSection = () => {
                         ? "bg-green-600 text-white shadow-md ring-2 ring-green-500/40 scale-105"
                         : "bg-slate-800/80 text-gray-300 hover:bg-slate-700 hover:text-white"
                     }`}
-                    onClick={() => handleProviderSelect(pName, "dub")}
+                    onClick={() => {
+                      setSelectedAudioLanguage("");
+                      handleProviderSelect(pName, "dub");
+                    }}
                   >
                     {pName}
                   </Button>
-                );
+                )];
               })}
             </div>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-3 text-sm shrink-0 self-start md:self-auto">
+          {episodeData?.downloads && episodeData.downloads.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  size="sm"
+                  className="h-8 px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1.5 shadow-sm"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                className="w-56 p-2 bg-[#0f172a] border border-slate-700 rounded-xl shadow-xl z-50 text-xs"
+              >
+                <p className="font-bold text-slate-300 px-2 py-1 mb-1 border-b border-slate-800">
+                  Select Quality:
+                </p>
+                <div className="flex flex-col gap-1">
+                  {episodeData.downloads.map((dl, idx) => (
+                    <a
+                      key={`dl-${idx}`}
+                      href={dl.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-200 transition font-medium"
+                    >
+                      <span>{dl.label || dl.quality || "Download"}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-800/40">
+                        {dl.quality || "Web-DL"}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
           {localProxyActive && (
             <a
               href={COMPANION_UI_URL}

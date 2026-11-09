@@ -35,6 +35,7 @@ interface ArtPlayerProps extends HTMLAttributes<HTMLDivElement> {
   autoSkip?: boolean;
   serversData: IEpisodeServers;
   onError?: () => void;
+  targetAudioLanguage?: string;
 }
 
 // --- Helper to generate highlights ---
@@ -64,6 +65,7 @@ function AniflixPlayer({
   autoSkip = true,
   serversData,
   onError,
+  targetAudioLanguage,
   ...rest // Spread other div attributes like className, id, etc.
 }: ArtPlayerProps): React.JSX.Element {
   const artContainerRef = useRef<HTMLDivElement>(null); // Ref for the mounting div
@@ -434,6 +436,20 @@ function AniflixPlayer({
             const hls = new Hls();
             hls.loadSource(url);
             hls.attachMedia(videoElement);
+            if (targetAudioLanguage) {
+              const applyTargetLanguage = () => {
+                const langLower = targetAudioLanguage.toLowerCase();
+                const trackIdx = hls.audioTracks.findIndex((t: any) =>
+                  (t.name && t.name.toLowerCase().includes(langLower)) ||
+                  (t.lang && t.lang.toLowerCase().startsWith(langLower.slice(0, 2)))
+                );
+                if (trackIdx !== -1 && hls.audioTrack !== trackIdx) {
+                  hls.audioTrack = trackIdx;
+                }
+              };
+              hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, applyTargetLanguage);
+              hls.on(Hls.Events.MANIFEST_PARSED, applyTargetLanguage);
+            }
             hls.on(Hls.Events.ERROR, (event, data) => {
               if (data.fatal) {
                 console.error("Fatal HLS error encountered:", data);

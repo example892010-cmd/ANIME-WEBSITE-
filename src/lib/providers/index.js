@@ -12,6 +12,7 @@ import kaaHandler                  from "./providers/kickassanime.js";
 import animedunyaHandler           from "./providers/animedunya.js";
 import animeonsenHandler           from "./providers/animeonsen.js";
 import anipmHandler                from "./providers/anipm.js";
+import animeworldHandler          from "./providers/animeworld.js";
 import { getEpisodesResponse, getFilteredEpisodesResponse } from "./core/episode-cache.js";
 import { resolveProviders }         from "./core/episode-strategy.js";
 import { getAsync, setAsync, isFresh, mapTTL, WATCH_TTL, _CACHE_ENABLED } from "./core/smartcache.js";
@@ -377,6 +378,16 @@ export default {
       );
     }
 
+    m = path.match(/^\/watch\/animeworld\/(\d+)\/(sub|dub)\/animeworld-(\d+)\/?$/);
+    if (m) {
+      const [, id, audio, ep] = m;
+      return cachedWatch(
+        `watch:animeworld:${id}:${audio}:${ep}`,
+        () => animeworldHandler.fetch(request),
+        SIGNED_STREAM_WATCH_TTL
+      );
+    }
+
     if (path.startsWith("/watch/")) return json({ error: "Not found" }, 404);
 
     return json({
@@ -395,6 +406,7 @@ export default {
         "animedunya",
         "animeonsen",
         "anipm",
+        "animeworld",
       ],
       routes: [
         "/map/:anilistId",
@@ -413,6 +425,7 @@ export default {
         "/watch/animedunya/:id/sub|dub/animedunya-:ep",
         "/watch/animeonsen/:id/sub|dub/animeonsen-:ep",
         "/watch/anipm/:id/sub|dub/anipm-:ep",
+        "/watch/animeworld/:id/sub|dub/animeworld-:ep",
       ],
     });
   },

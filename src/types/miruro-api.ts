@@ -312,4 +312,6 @@ export interface WatchSourcesResponse {
   intro?: SkipInterval;
   outro?: SkipInterval;
   headers?: Record<string, string>;
+  downloads?: Array<{ url: string; quality?: string; label?: string }>;
+  languages?: string[];
 }

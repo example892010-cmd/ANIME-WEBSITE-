@@ -17,6 +17,7 @@ const KNOWN_PROVIDERS = [
   "animeonsen",
   "senshi",
   "anipm",
+  "animeworld",
   "mkissa",
 ];
 

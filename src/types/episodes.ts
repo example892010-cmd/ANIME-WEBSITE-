@@ -12,7 +12,15 @@ export interface Episode {
   hasDub?: boolean;
 }
 
+export interface DownloadOption {
+  url: string;
+  quality?: string;
+  label?: string;
+}
+
 export interface IEpisodeSource {
+  downloads?: DownloadOption[];
+  languages?: string[];
   headers: {
     Referer: string;
     [key: string]: string;
@@ -65,4 +73,6 @@ export interface Source {
   referer?: string;
   headers?: Record<string, string>;
   playlist_key?: string;
+  languages?: string[];
+  quality?: string;
 }

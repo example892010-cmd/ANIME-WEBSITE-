@@ -17,6 +17,8 @@ const getEpisodeData = async (
       intro: { start: 0, end: 0 },
       outro: { start: 0, end: 0 },
       sources: [],
+      downloads: [],
+      languages: [],
       anilistID: 0,
       malID: 0,
     };
@@ -52,6 +54,8 @@ const getEpisodeData = async (
     referer: s.referer || s.headers?.Referer || s.headers?.referer || "",
     headers: s.headers,
     playlist_key: s.playlist_key || s.key,
+    languages: (s as any).languages,
+    quality: s.quality,
   }));
 
 const SUB_LANG_MAP: Record<string, string> = {
@@ -144,6 +148,8 @@ function resolveSubLabel(sub: any, fileUrl: string): string {
     intro: data?.intro || { start: 0, end: 0 },
     outro: data?.outro || { start: 0, end: 0 },
     sources,
+    downloads: (data as any)?.downloads || [],
+    languages: (data as any)?.languages || [],
     anilistID: anilistId,
     malID: 0,
   };
