@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { KeyRound, LogOut, Plus, Pencil, Trash2, Upload, ShieldCheck, RefreshCw } from "lucide-react";
 
-type Anime = { id: string; slug: string; title: string; description: string; poster: string; banner: string; status: string; genres: string[]; audioLanguages: string[]; qualities: string[]; seasons: any[]; featured: boolean };
+type Anime = { id: string; slug: string; title: string; description: string; poster: string; posterUrl?: string; banner: string; status: string; genres: string[]; audioLanguages: string[]; qualities: string[]; seasons: any[]; featured: boolean };
 const emptyForm = { title: "", slug: "", description: "", posterUrl: "", bannerUrl: "", status: "ONGOING", genres: "Action, Adventure, Fantasy", audioLanguages: "Tamil", qualities: "480p, 720p, 1080p", seasons: '[\n  { "number": 1, "title": "Season 1", "episodes": [] }\n]', featured: false };
 
 async function responseJson(response: Response) {

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   if (!requestHasAdminSession(request)) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   try {
     const pb = await getAdminPocketBase();
-    const payload = await readPayload(request);
+    const payload: Record<string, any> = await readPayload(request);
     if (payload.poster instanceof File) payload.posterUrl = "";
     const created = await pb.collection("site_anime").create(payload);
     return NextResponse.json({ item: toPublicAnime(created) }, { status: 201 });
