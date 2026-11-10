@@ -167,7 +167,7 @@ export default function AnimeDetailsPage() {
   // Watch URL resolution
   const watchUrl = useMemo(() => {
     if (hasWatchedAnime && latestEpisodeWatched) {
-      return `${ROUTES.WATCH}?anime=${animeId}&episode=${latestEpisodeWatched}`;
+      return `${ROUTES.WATCH}?anime=${animeId}&ep=${latestEpisodeWatched}`;
     }
     return `${ROUTES.WATCH}?anime=${animeId}&ep=1`;
   }, [animeId, hasWatchedAnime, latestEpisodeWatched]);
@@ -295,24 +295,6 @@ export default function AnimeDetailsPage() {
             </div>
           )}
 
-          {/* Languages */}
-          <div className="mt-4 border-t border-white/5 pt-4">
-            <span className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Languages
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {["English", "Hindi", "Japanese", "Tamil", "Telugu", "Malayalam"].map(
-                (lang) => (
-                  <span
-                    key={lang}
-                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-slate-300"
-                  >
-                    {lang}
-                  </span>
-                )
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Season Selector Tabs */}

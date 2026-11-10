@@ -25,6 +25,46 @@ import Image from "next/image";
 const WATCH_PROGRESS_UPDATE_INTERVAL = 10000; // Update every 10 seconds
 const WATCH_PROGRESS_MIN_WATCH_TIME = 10; // Min seconds watched to create record
 
+const AUDIO_LANGUAGE_ALIASES: Record<string, string[]> = {
+  tamil: ["tamil", "tam", "ta"],
+  telugu: ["telugu", "tel", "te"],
+  hindi: ["hindi", "hin", "hi"],
+  malayalam: ["malayalam", "mal", "ml"],
+  english: ["english", "eng", "en"],
+};
+
+function canonicalAudioLanguage(track: any): string | null {
+  const values = [track?.lang, track?.language, track?.name, track?.label]
+    .filter(Boolean)
+    .map((value: string) => String(value).toLowerCase().trim());
+
+  for (const [language, aliases] of Object.entries(AUDIO_LANGUAGE_ALIASES)) {
+    if (values.some((value) => aliases.some((alias) => {
+      if (alias.length <= 2) {
+        return value === alias || value.startsWith(`${alias}-`) || value.startsWith(`${alias}_`);
+      }
+      return value === alias || value.includes(alias) || value.startsWith(`${alias}-`) || value.startsWith(`${alias}_`);
+    }))) return language;
+  }
+  return null;
+}
+
+function findAudioTrackIndex(tracks: any[], targetLanguage: string): number {
+  const target = targetLanguage.toLowerCase().trim();
+  const aliases = AUDIO_LANGUAGE_ALIASES[target] || [target];
+  return tracks.findIndex((track) => {
+    const values = [track?.lang, track?.language, track?.name, track?.label]
+      .filter(Boolean)
+      .map((value: string) => String(value).toLowerCase().trim());
+    return values.some((value) => aliases.some((alias) => {
+      if (alias.length <= 2) {
+        return value === alias || value.startsWith(`${alias}-`) || value.startsWith(`${alias}_`);
+      }
+      return value === alias || value.includes(alias) || value.startsWith(`${alias}-`) || value.startsWith(`${alias}_`);
+    }));
+  });
+}
+
 // --- Define Props for the Combined Player ---
 interface ArtPlayerProps extends HTMLAttributes<HTMLDivElement> {
   episodeInfo: IEpisodeSource; // Source info including URLs, tracks, intro/outro
@@ -36,6 +76,8 @@ interface ArtPlayerProps extends HTMLAttributes<HTMLDivElement> {
   serversData: IEpisodeServers;
   onError?: () => void;
   targetAudioLanguage?: string;
+  onAvailableAudioLanguages?: (languages: string[]) => void;
+  onEnded?: () => void;
 }
 
 // --- Helper to generate highlights ---
@@ -66,11 +108,41 @@ function AniflixPlayer({
   serversData,
   onError,
   targetAudioLanguage,
+  onAvailableAudioLanguages,
+  onEnded,
   ...rest
 }: ArtPlayerProps): React.JSX.Element {
   const artContainerRef = useRef<HTMLDivElement>(null);
   const artInstanceRef = useRef<Artplayer | null>(null);
   const hlsInstanceRef = useRef<Hls | null>(null);
+  const nativeAudioTracksRef = useRef<any>(null);
+  const targetAudioLanguageRef = useRef(targetAudioLanguage || "");
+  const onAvailableAudioLanguagesRef = useRef(onAvailableAudioLanguages);
+  const onEndedRef = useRef(onEnded);
+
+  useEffect(() => {
+    targetAudioLanguageRef.current = targetAudioLanguage || "";
+    onAvailableAudioLanguagesRef.current = onAvailableAudioLanguages;
+    onEndedRef.current = onEnded;
+
+    const target = targetAudioLanguageRef.current.toLowerCase().trim();
+    if (!target) return;
+
+    const hls = hlsInstanceRef.current;
+    if (hls?.audioTracks?.length) {
+      const index = findAudioTrackIndex(hls.audioTracks, target);
+      if (index >= 0 && hls.audioTrack !== index) hls.audioTrack = index;
+      return;
+    }
+
+    const nativeTracks = Array.from(nativeAudioTracksRef.current || []) as any[];
+    const nativeIndex = findAudioTrackIndex(nativeTracks, target);
+    if (nativeIndex >= 0) {
+      nativeTracks.forEach((track, index) => {
+        track.enabled = index === nativeIndex;
+      });
+    }
+  }, [targetAudioLanguage, onAvailableAudioLanguages, onEnded]);
 
   const isAutoSkipEnabledRef = useRef<boolean>(autoSkip);
   const animeInfoRef = useRef(animeInfo);
@@ -442,69 +514,24 @@ function AniflixPlayer({
             hls.loadSource(url);
             hls.attachMedia(videoElement);
 
-            // Audio Language Syncing Engine
-            if (targetAudioLanguage) {
-              const applyTargetLanguage = () => {
-                if (!hls.audioTracks || hls.audioTracks.length === 0) return;
+            // Read the real HLS audio-track metadata; never invent language options.
+            nativeAudioTracksRef.current = null;
+            const syncAudioTracks = () => {
+              const tracks = hls.audioTracks || [];
+              const languages = Array.from(new Set(
+                tracks.map(canonicalAudioLanguage).filter((language): language is string => Boolean(language)),
+              ));
+              onAvailableAudioLanguagesRef.current?.(languages);
 
-                const target = targetAudioLanguage.toLowerCase().trim();
-                const trackIdx = hls.audioTracks.findIndex((track: any) => {
-                  const name = (track.name || "").toLowerCase().trim();
-                  const lang = (track.lang || "").toLowerCase().trim();
+              const target = targetAudioLanguageRef.current.toLowerCase().trim();
+              if (!target || !tracks.length) return;
+              const trackIdx = findAudioTrackIndex(tracks, target);
+              if (trackIdx >= 0 && hls.audioTrack !== trackIdx) hls.audioTrack = trackIdx;
+            };
 
-                  if (target === "tamil") {
-                    return (
-                      name.includes("tamil") ||
-                      name.includes("tam") ||
-                      lang === "ta" ||
-                      lang.startsWith("tam")
-                    );
-                  }
-                  if (target === "telugu") {
-                    return (
-                      name.includes("telugu") ||
-                      name.includes("tel") ||
-                      lang === "te" ||
-                      lang.startsWith("tel")
-                    );
-                  }
-                  if (target === "hindi") {
-                    return (
-                      name.includes("hindi") ||
-                      name.includes("hin") ||
-                      lang === "hi" ||
-                      lang.startsWith("hin")
-                    );
-                  }
-                  if (target === "malayalam") {
-                    return (
-                      name.includes("malayalam") ||
-                      name.includes("mal") ||
-                      lang === "ml" ||
-                      lang.startsWith("mal")
-                    );
-                  }
-                  if (target === "english") {
-                    return (
-                      name.includes("english") ||
-                      name.includes("eng") ||
-                      lang === "en" ||
-                      lang.startsWith("eng")
-                    );
-                  }
-
-                  return name.includes(target) || lang.includes(target);
-                });
-
-                if (trackIdx !== -1 && hls.audioTrack !== trackIdx) {
-                  hls.audioTrack = trackIdx;
-                }
-              };
-
-              hls.on(Hls.Events.MANIFEST_PARSED, applyTargetLanguage);
-              hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, applyTargetLanguage);
-              hls.on(Hls.Events.LEVEL_LOADED, applyTargetLanguage);
-            }
+            hls.on(Hls.Events.MANIFEST_PARSED, syncAudioTracks);
+            hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, syncAudioTracks);
+            hls.on(Hls.Events.LEVEL_LOADED, syncAudioTracks);
 
             hls.on(Hls.Events.ERROR, (event, data) => {
               if (data.fatal) {
@@ -526,6 +553,35 @@ function AniflixPlayer({
             videoElement.canPlayType("application/vnd.apple.mpegurl")
           ) {
             videoElement.src = url;
+            // Safari/iOS may use native HLS instead of hls.js. Read its real AudioTrackList.
+            const syncNativeAudioTracks = () => {
+              const nativeTracks = (videoElement as any).audioTracks;
+              nativeAudioTracksRef.current = nativeTracks || null;
+              nativeTracks?.addEventListener?.("addtrack", syncNativeAudioTracks);
+              const tracks = Array.from(nativeTracks || []) as any[];
+              const languages = Array.from(new Set(
+                tracks.map(canonicalAudioLanguage).filter((language): language is string => Boolean(language)),
+              ));
+              onAvailableAudioLanguagesRef.current?.(languages);
+              const target = targetAudioLanguageRef.current.toLowerCase().trim();
+              if (!target || !tracks.length) return;
+              const trackIndex = findAudioTrackIndex(tracks, target);
+              if (trackIndex >= 0) {
+                tracks.forEach((track, index) => {
+                  track.enabled = index === trackIndex;
+                });
+              }
+            };
+            videoElement.addEventListener("loadedmetadata", syncNativeAudioTracks);
+            videoElement.addEventListener("loadeddata", syncNativeAudioTracks);
+            syncNativeAudioTracks();
+            artPlayerInstance.on("destroy", () => {
+              const nativeTracks = (videoElement as any).audioTracks;
+              videoElement.removeEventListener("loadedmetadata", syncNativeAudioTracks);
+              videoElement.removeEventListener("loadeddata", syncNativeAudioTracks);
+              nativeTracks?.removeEventListener?.("addtrack", syncNativeAudioTracks);
+              nativeAudioTracksRef.current = null;
+            });
           } else {
             artPlayerInstance.notice.show =
               "HLS playback is not supported on your browser.";
@@ -811,9 +867,13 @@ function AniflixPlayer({
         void ensureBookmarkAndSync(art.currentTime, art.duration);
       }
     };
+    const handleVideoEnded = () => {
+      handleInteractionUpdate();
+      onEndedRef.current?.();
+    };
     art.on("video:pause", handleInteractionUpdate);
     art.on("video:seeked", handleInteractionUpdate);
-    art.on("video:ended", handleInteractionUpdate);
+    art.on("video:ended", handleVideoEnded);
 
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
@@ -847,7 +907,7 @@ function AniflixPlayer({
       if (art) {
         art.off("video:pause", handleInteractionUpdate);
         art.off("video:seeked", handleInteractionUpdate);
-        art.off("video:ended", handleInteractionUpdate);
+        art.off("video:ended", handleVideoEnded);
         art.off("video:timeupdate", handleTimeUpdate);
 
         art.pause();
@@ -874,7 +934,7 @@ function AniflixPlayer({
         }
       }
     };
-  }, [uri, subOrDub, targetAudioLanguage]);
+  }, [uri, subOrDub]);
 
   return (
     <div

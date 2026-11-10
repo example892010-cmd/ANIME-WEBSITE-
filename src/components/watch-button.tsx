@@ -22,7 +22,7 @@ const WatchButton = () => {
       href={
         !hasWatchedAnime
           ? `${ROUTES.WATCH}?anime=${animeId}`
-          : `${ROUTES.WATCH}?anime=${animeId}&episode=${latestEpisodeWatched}`
+          : `${ROUTES.WATCH}?anime=${animeId}&ep=${latestEpisodeWatched}`
       }
       className="max-w-fit text-base"
       LeftIcon={CirclePlay}

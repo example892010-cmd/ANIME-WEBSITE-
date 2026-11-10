@@ -23,7 +23,7 @@ A mobile-friendly anime discovery and streaming interface branded for **ANIFLIX 
 
 1. Copy `.env.example` to `.env`.
 2. Configure `POCKETBASE_URL`, `PB_SUPERUSER_EMAIL` and `PB_SUPERUSER_PASSWORD`. The PocketBase account must be a superuser, because the app creates its two private/public content collections automatically on the first admin setup.
-3. Set `ADMIN_INITIAL_PASSWORD` to `shiyam` for the initial admin password. It is only used to initialize a password hash in PocketBase. Once the first successful admin setup has seeded the hash, remove `ADMIN_INITIAL_PASSWORD` from the hosting environment.
+3. Set `ADMIN_INITIAL_PASSWORD` to a unique, strong password of your choice for first-time admin setup. It is only used to initialize a password hash in PocketBase. Once the first successful admin setup has seeded the hash, remove `ADMIN_INITIAL_PASSWORD` from the hosting environment.
 4. Set `ADMIN_SESSION_SECRET` to a unique random secret of at least 32 characters.
 5. Set `ADMIN_RECOVERY_CODE` to a unique private recovery code (preferably 32+ random characters). Keep it somewhere safe; it is required by the Forgot Password flow and recovery attempts are rate-limited.
 6. Install and run:
@@ -43,7 +43,7 @@ The public website does not ask visitors to log in. Open `/settings` and enter t
 | `NEXT_PUBLIC_POCKETBASE_URL` | Recommended | PocketBase URL used by existing user-data features |
 | `PB_SUPERUSER_EMAIL` | Yes for admin tools | PocketBase superuser email |
 | `PB_SUPERUSER_PASSWORD` | Yes for admin tools | PocketBase superuser password; server-side only |
-| `ADMIN_INITIAL_PASSWORD` | First setup only | Set to `shiyam` before the first admin login; remove after hash initialization |
+| `ADMIN_INITIAL_PASSWORD` | First setup only | Your own unique initial admin password; remove after hash initialization |
 | `ADMIN_SESSION_SECRET` | Yes | HMAC signing key, at least 32 characters |
 | `ADMIN_RECOVERY_CODE` | Yes for recovery | Private code used to verify password recovery |
 | `TELEGRAM_ADMIN_BOT_SECRET` | Yes for Telegram bot | Shared server-to-bot secret; keep private |
@@ -54,7 +54,7 @@ The admin password is hashed with scrypt and stored in the private PocketBase `s
 
 ### Admin password
 
-- Initial password: `shiyam` (set through `ADMIN_INITIAL_PASSWORD` during first setup; it is never embedded in browser JavaScript).
+- Initial password: the unique value you configure through `ADMIN_INITIAL_PASSWORD` during first setup; it is never embedded in browser JavaScript.
 - Change Password verifies the current password before saving a new password. New passwords must be at least 8 characters.
 - Forgot Password requires `ADMIN_RECOVERY_CODE` from the hosting environment. It does not reset the password merely because someone clicks a button.
 - Admin sessions use an HTTP-only, same-site cookie and expire after 12 hours.

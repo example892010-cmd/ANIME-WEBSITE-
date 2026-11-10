@@ -18,7 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -26,6 +26,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useGetAllEpisodes } from "@/query/get-all-episodes";
 import useBookMarks from "@/hooks/use-get-bookmark";
 import { useGetSourceAvailable } from "@/query/get-source-available";
+import { ROUTES } from "@/constants/routes";
 import {
   COMPANION_DOWNLOAD_URL,
   COMPANION_UI_URL,
@@ -34,6 +35,7 @@ import {
 
 const VideoPlayerSection = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const animeIdParam = searchParams.get("anime") || "";
   const epParam = searchParams.get("ep");
   const episodeIdParam = searchParams.get("episode") || "";
@@ -99,6 +101,8 @@ const VideoPlayerSection = () => {
   const [autoSkip, setAutoSkip] = useState<boolean>(true);
   const [preferredCategory, setPreferredCategory] = useState<"sub" | "dub">("sub");
   const [selectedAudioLanguage, setSelectedAudioLanguage] = useState<string>("");
+  const [detectedAudioLanguages, setDetectedAudioLanguages] = useState<string[]>([]);
+  const [showNextEpisodePrompt, setShowNextEpisodePrompt] = useState(false);
 
   const { createOrUpdateBookMark, syncWatchProgress } = useBookMarks({
     animeID: animeIdParam,
@@ -117,6 +121,8 @@ const VideoPlayerSection = () => {
     if (storedCategory === "sub" || storedCategory === "dub") {
       setPreferredCategory(storedCategory);
     }
+    const storedAudioLanguage = localStorage.getItem("aniflix_audio_language");
+    if (storedAudioLanguage) setSelectedAudioLanguage(storedAudioLanguage);
   }, []);
 
   function onHandleAutoSkipChange(value: boolean) {
@@ -149,6 +155,24 @@ const VideoPlayerSection = () => {
     (Number.isFinite(parsedEpFromSlug) && parsedEpFromSlug > 0
       ? parsedEpFromSlug
       : Number(epParam) || 1);
+
+  useEffect(() => {
+    setDetectedAudioLanguages([]);
+    setShowNextEpisodePrompt(false);
+  }, [activeEpisodeId]);
+
+  const handleAvailableAudioLanguages = React.useCallback((languages: string[]) => {
+    setDetectedAudioLanguages(languages);
+  }, []);
+
+  const handleVideoEnded = React.useCallback(() => {
+    setShowNextEpisodePrompt(true);
+  }, []);
+
+  const handleAudioLanguageSelect = (language: string) => {
+    setSelectedAudioLanguage(language);
+    localStorage.setItem("aniflix_audio_language", language);
+  };
 
   // Reset failed providers when switching to a different episode number
   useEffect(() => {
@@ -368,6 +392,18 @@ const VideoPlayerSection = () => {
     ? Math.floor((nextAiring.timeUntilAiring % 86400) / 3600)
     : 0;
 
+  const nextEpisode = allEpisodesData?.episodes?.find(
+    (episode) => Number(episode.number) === Number(currentEpNumber) + 1,
+  );
+
+  const playNextEpisode = () => {
+    if (!nextEpisode?.episodeId) return;
+    setShowNextEpisodePrompt(false);
+    setUseFallback(false);
+    setSelectedEpisode(nextEpisode.episodeId);
+    router.push(`${ROUTES.WATCH}?anime=${encodeURIComponent(animeIdParam)}&ep=${nextEpisode.number}`);
+  };
+
   const fallbackAnimeId = animeIdParam || anime?.anime?.info?.id || "1";
   const fallbackEpId = currentEpNumber || "1";
   const fallbackSrc = `https://megaplay.buzz/stream/ani/${fallbackAnimeId}/${fallbackEpId}/${activeCategory}`;
@@ -408,10 +444,24 @@ const VideoPlayerSection = () => {
             image: anime?.anime?.info?.poster || "",
           }}
           subOrDub={activeCategory}
-          targetAudioLanguage={selectedAudioLanguage}
+          targetAudioLanguage={currentProviderName.toLowerCase() === "animeworld" ? selectedAudioLanguage : ""}
+          onAvailableAudioLanguages={handleAvailableAudioLanguages}
+          onEnded={handleVideoEnded}
           autoSkip={autoSkip}
           onError={tryNextProviderOrFallback}
         />
+      )}
+
+      {showNextEpisodePrompt && nextEpisode && (
+        <Alert className="border-purple-500/40 bg-purple-950/40 text-purple-100 rounded-xl">
+          <AlertTitle className="font-bold">Episode finished</AlertTitle>
+          <AlertDescription className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-purple-100/80 mt-1">
+            <span>Continue with Episode {nextEpisode.number}{nextEpisode.title ? ` — ${nextEpisode.title}` : ""}?</span>
+            <Button size="sm" onClick={playNextEpisode} className="shrink-0 bg-purple-600 hover:bg-purple-500 text-white">
+              Play Next Episode
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
 
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 w-full p-5 bg-[#0f172a] border border-slate-800 rounded-xl">
@@ -454,18 +504,43 @@ const VideoPlayerSection = () => {
               </p>
               {dubProvidersForEp.flatMap((pName) => {
                 if (pName.toLowerCase() === "animeworld") {
-                  const defaultLangs = ["tamil", "telugu", "hindi", "malayalam", "english", "multi-audio"];
-                  const verifiedLangs = episodeData?.languages && episodeData.languages.length > 0
-                    ? episodeData.languages
-                    : defaultLangs;
+                  const supportedLanguages = ["tamil", "telugu", "hindi", "malayalam", "english"];
+                  const isAnimeWorldActive = currentProviderName.toLowerCase() === "animeworld";
+                  const verifiedLangs = isAnimeWorldActive
+                    ? Array.from(new Set([
+                        ...(episodeData?.languages || []),
+                        ...detectedAudioLanguages,
+                      ].map((language) => String(language).toLowerCase().trim())))
+                        .filter((language) => supportedLanguages.includes(language))
+                    : [];
 
-                  return verifiedLangs.map((lang) => {
+                  if (verifiedLangs.length === 0) {
+                    const isActive = !isFallbackActive && isAnimeWorldActive && activeCategory === "dub";
+                    return [
+                      <Button
+                        size="sm"
+                        key="dub-animeworld"
+                        className={`font-bold text-xs px-3 transition-all ${
+                          isActive
+                            ? "bg-emerald-500 text-slate-950 shadow-md ring-2 ring-emerald-400/40 scale-105"
+                            : "bg-slate-800/80 text-gray-300 hover:bg-slate-700 hover:text-white"
+                        }`}
+                        onClick={() => handleProviderSelect(pName, "dub")}
+                      >
+                        AnimeWorld
+                      </Button>,
+                    ];
+                  }
+
+                  return verifiedLangs.map((lang, index) => {
                     const label = `${lang.charAt(0).toUpperCase() + lang.slice(1)} (AnimeWorld)`;
                     const isLangActive =
                       !isFallbackActive &&
                       currentProviderName.toLowerCase() === "animeworld" &&
                       activeCategory === "dub" &&
-                      (!selectedAudioLanguage || selectedAudioLanguage.toLowerCase() === lang.toLowerCase());
+                      (selectedAudioLanguage
+                        ? selectedAudioLanguage.toLowerCase() === lang
+                        : index === 0);
 
                     return (
                       <Button
@@ -477,7 +552,7 @@ const VideoPlayerSection = () => {
                             : "bg-slate-800/80 text-gray-300 hover:bg-slate-700 hover:text-white"
                         }`}
                         onClick={() => {
-                          setSelectedAudioLanguage(lang === "multi-audio" ? "" : lang);
+                          handleAudioLanguageSelect(lang);
                           handleProviderSelect(pName, "dub");
                         }}
                       >
@@ -502,7 +577,6 @@ const VideoPlayerSection = () => {
                         : "bg-slate-800/80 text-gray-300 hover:bg-slate-700 hover:text-white"
                     }`}
                     onClick={() => {
-                      setSelectedAudioLanguage("");
                       handleProviderSelect(pName, "dub");
                     }}
                   >

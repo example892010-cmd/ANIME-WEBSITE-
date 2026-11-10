@@ -22,6 +22,10 @@ const navbar = fs.readFileSync("src/components/navbar.tsx", "utf8");
 const auth = fs.readFileSync("src/lib/admin-server.ts", "utf8");
 const admin = fs.readFileSync("src/components/admin/admin-settings.tsx", "utf8");
 const bot = fs.readFileSync("telegram-admin-bot/bot.py", "utf8");
+const watchPage = fs.readFileSync("src/app/anime/watch/video-player-section.tsx", "utf8");
+const player = fs.readFileSync("src/components/aniflix-player.tsx", "utf8");
+const animeDetails = fs.readFileSync("src/app/anime/[slug]/page.tsx", "utf8");
+const watchButton = fs.readFileSync("src/components/watch-button.tsx", "utf8");
 const checks = [
   ["Public navigation contains no user login UI", !/LoginPopoverButton|NavbarAvatar/.test(navbar)],
   ["Admin password is hashed with scrypt", /scrypt\(/.test(auth)],
@@ -38,6 +42,15 @@ const checks = [
   ["Existing anime details support guest list management", !/if \(!auth\)/.test(fs.readFileSync("src/app/anime/[slug]/page.tsx", "utf8"))],
   ["Telegram join link is configured", /t\.me\/\+98iAagsDsjI5NDk1/.test(fs.readFileSync("src/components/telegram-banner.tsx", "utf8"))],
   ["Recovery flow requires a private recovery code", /ADMIN_RECOVERY_CODE/.test(auth)],
+  ["AnimeWorld language buttons are based on verified track metadata", !/defaultLangs|multi-audio/.test(watchPage) && /episodeData\?\.languages/.test(watchPage)],
+  ["AnimeWorld audio preference persists between episodes", /aniflix_audio_language/.test(watchPage)],
+  ["Player reports real HLS audio tracks", /AUDIO_TRACKS_UPDATED/.test(player) && /onAvailableAudioLanguagesRef/.test(player)],
+  ["Player exposes an end-of-episode callback", /onEndedRef\.current/.test(player) && /handleVideoEnded/.test(player)],
+  ["Watch page offers a next-episode prompt", /Play Next Episode/.test(watchPage) && /router\.push/.test(watchPage)],
+  ["Details page does not claim fixed audio languages", !/\[\"English", \"Hindi", \"Japanese", \"Tamil"/.test(animeDetails)],
+  ["Continue Watching uses the supported ep query parameter", /&ep=\$\{latestEpisodeWatched\}/.test(animeDetails) && /&ep=\$\{latestEpisodeWatched\}/.test(watchButton)],
+  ["Native HLS audio tracks are supported", /nativeAudioTracksRef/.test(player) && /loadedmetadata/.test(player)],
+  ["Unused legacy player and logo assets are removed", !fs.existsSync("src/components/kitsune-player.tsx") && !fs.existsSync("logo.png")],
 ];
 for (const [name, passed] of checks) {
   console.log(`${passed ? "PASS" : "FAIL"} ${name}`);

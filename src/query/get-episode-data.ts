@@ -54,9 +54,14 @@ const getEpisodeData = async (
     referer: s.referer || s.headers?.Referer || s.headers?.referer || "",
     headers: s.headers,
     playlist_key: s.playlist_key || s.key,
-    languages: (s as any).languages,
+    languages: s.languages,
     quality: s.quality,
   }));
+
+  const audioLanguages = Array.from(new Set([
+    ...(Array.isArray(data?.languages) ? data.languages : []),
+    ...playableStreams.flatMap((stream) => Array.isArray(stream.languages) ? stream.languages : []),
+  ].map((language) => String(language).toLowerCase().trim()).filter(Boolean)));
 
 const SUB_LANG_MAP: Record<string, string> = {
   en: "English", eng: "English", enm: "English",
@@ -149,7 +154,7 @@ function resolveSubLabel(sub: any, fileUrl: string): string {
     outro: data?.outro || { start: 0, end: 0 },
     sources,
     downloads: (data as any)?.downloads || [],
-    languages: (data as any)?.languages || [],
+    languages: audioLanguages,
     anilistID: anilistId,
     malID: 0,
   };

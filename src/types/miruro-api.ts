@@ -286,6 +286,7 @@ export interface StreamSourceItem {
   }>;
   priority?: number;
   isActive?: boolean;
+  languages?: string[];
 }
 
 export interface SubtitleItem {
