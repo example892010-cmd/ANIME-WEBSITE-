@@ -12,7 +12,6 @@ import {
   Clock,
   Calendar,
   Mic,
-  ChevronRight,
   BookmarkCheck,
   TvMinimalPlay,
   CheckCheck,
@@ -25,7 +24,6 @@ import Container from "@/components/container";
 import AnimeCard from "@/components/anime-card";
 import AnimeCarousel from "@/components/anime-carousel";
 import CharacterCard from "@/components/common/character-card";
-import WatchTrailer from "@/components/watch-trailer";
 import Select, { ISelectOptions } from "@/components/common/select";
 import Loading from "@/app/loading";
 import { ROUTES } from "@/constants/routes";
@@ -398,7 +396,7 @@ export default function AnimeDetailsPage() {
           )}
         </div>
 
-        {/* Characters Section (Optional Expansion) */}
+        {/* Characters Section */}
         {info.charactersVoiceActors && info.charactersVoiceActors.length > 0 && (
           <div className="mt-14">
             <h2 className="text-xl font-bold mb-4">Characters</h2>

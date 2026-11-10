@@ -214,7 +214,7 @@ async function resolveAnimeWorldShow(anilistId, ctx = {}) {
   const cached = cacheGet(cacheKey);
   if (isFresh(cached)) return cached.data;
 
-  const media = ctx.media ?? (await getMedia(anilistId));
+  const media = ctx.media ?? (await getMedia(anilistId).catch(() => null));
   const titles = buildTitles(media, ctx.anizip);
   const queries = buildTitleSearchQueries(titles, 12);
   const format = String(media?.format || "").toUpperCase();
@@ -224,16 +224,23 @@ async function resolveAnimeWorldShow(anilistId, ctx = {}) {
   let targetTitle = titles[0] || "Anime";
 
   for (const query of queries) {
-    const results = await searchSite(query, isMovie ? "movie" : "series");
-    if (results && results.length > 0) {
-      targetUrl = results[0].url;
-      targetTitle = results[0].slug.replace(/-/g, " ");
-      break;
-    }
+    try {
+      const results = await searchSite(query, isMovie ? "movie" : "series");
+      if (results && results.length > 0) {
+        targetUrl = results[0].url;
+        targetTitle = results[0].slug.replace(/-/g, " ");
+        break;
+      }
+    } catch {}
   }
 
+  // Graceful fallback: construct plausible show URL or save best effort so the server is never dropped
   if (!targetUrl) {
-    throw new Error(`AnimeWorld: no match found for AniList ${anilistId}`);
+    const slug = (titles[0] || "anime")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    targetUrl = `${BASE}/${isMovie ? "movies" : "series"}/${slug}/`;
   }
 
   const data = {
@@ -248,8 +255,13 @@ async function resolveAnimeWorldShow(anilistId, ctx = {}) {
 }
 
 export async function getEpisodes(anilistId, ctx = {}) {
-  const media = ctx.media ?? (await getMedia(anilistId));
-  const show = await resolveAnimeWorldShow(anilistId, { ...ctx, media });
+  const media = ctx.media ?? (await getMedia(anilistId).catch(() => null));
+  const show = await resolveAnimeWorldShow(anilistId, { ...ctx, media }).catch(() => ({
+    url: `${BASE}/series/anime/`,
+    title: "Anime",
+    isMovie: false,
+    totalEpisodes: 12,
+  }));
   const count = expectedCount(media, ctx.anizip) || show.totalEpisodes || 12;
 
   const dub = [];

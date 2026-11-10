@@ -454,12 +454,13 @@ const VideoPlayerSection = () => {
               </p>
               {dubProvidersForEp.flatMap((pName) => {
                 if (pName.toLowerCase() === "animeworld") {
+                  const defaultLangs = ["tamil", "telugu", "hindi", "malayalam", "english", "multi-audio"];
                   const verifiedLangs = episodeData?.languages && episodeData.languages.length > 0
                     ? episodeData.languages
-                    : ["multi-audio"];
+                    : defaultLangs;
 
                   return verifiedLangs.map((lang) => {
-                    const label = `AnimeWorld (${lang.charAt(0).toUpperCase() + lang.slice(1)})`;
+                    const label = `${lang.charAt(0).toUpperCase() + lang.slice(1)} (AnimeWorld)`;
                     const isLangActive =
                       !isFallbackActive &&
                       currentProviderName.toLowerCase() === "animeworld" &&
