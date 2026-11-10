@@ -11,9 +11,9 @@ import Artplayer from "artplayer";
 import type { Option } from "artplayer";
 import Hls from "hls.js";
 
-// Helper functions and types (keep or import from your types file)
-import { IEpisodeServers, IEpisodeSource, IEpisodes } from "@/types/episodes"; // Adjust path as needed
-import loadingImage from "@/assets/genkai.gif"; // Adjust path as needed
+// Helper functions and types
+import { IEpisodeServers, IEpisodeSource, IEpisodes } from "@/types/episodes";
+import loadingImage from "@/assets/genkai.gif";
 import artplayerPluginHlsControl from "artplayer-plugin-hls-control";
 import artplayerPluginAmbilight from "artplayer-plugin-ambilight";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ const generateHighlights = (
   end: number | undefined | null,
   label: string,
 ): HighlightPoint[] => {
-  if (start == null || end == null || start >= end) return []; // Use >= to avoid single-second highlights
+  if (start == null || end == null || start >= end) return [];
   const highlights: HighlightPoint[] = [];
   for (let time = Math.floor(start); time <= Math.floor(end); time++) {
     highlights.push({ time, text: label });
@@ -66,11 +66,11 @@ function AniflixPlayer({
   serversData,
   onError,
   targetAudioLanguage,
-  ...rest // Spread other div attributes like className, id, etc.
+  ...rest
 }: ArtPlayerProps): React.JSX.Element {
-  const artContainerRef = useRef<HTMLDivElement>(null); // Ref for the mounting div
-  const artInstanceRef = useRef<Artplayer | null>(null); // Ref for the ArtPlayer instance
-  const hlsInstanceRef = useRef<Hls | null>(null); // Ref for the Hls.js instance
+  const artContainerRef = useRef<HTMLDivElement>(null);
+  const artInstanceRef = useRef<Artplayer | null>(null);
+  const hlsInstanceRef = useRef<Hls | null>(null);
 
   const isAutoSkipEnabledRef = useRef<boolean>(autoSkip);
   const animeInfoRef = useRef(animeInfo);
@@ -80,11 +80,11 @@ function AniflixPlayer({
 
   const bookmarkIdRef = useRef<string | null>(null);
   const inflightBookmarkRef = useRef<Promise<string | null> | null>(null);
-  const watchHistoryIdsRef = useRef<string[]>([]); // Store initial list
+  const watchHistoryIdsRef = useRef<string[]>([]);
   const watchedRecordIdRef = useRef<string | null>(null);
   const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastUpdateTimeRef = useRef<number>(0);
-  const hasMetMinWatchTimeRef = useRef<boolean>(false); // Track if min time met for this episode
+  const hasMetMinWatchTimeRef = useRef<boolean>(false);
   const initialSeekTimeRef = useRef<number | null>(null);
 
   const { auth } = useAuthStore();
@@ -118,7 +118,7 @@ function AniflixPlayer({
       });
 
     return inflightBookmarkRef.current;
-  }, [auth?.id, createOrUpdateBookMark]);
+  }, [createOrUpdateBookMark]);
 
   const ensureBookmarkAndSync = React.useCallback(
     async (currentTime: number, duration: number) => {
@@ -146,7 +146,7 @@ function AniflixPlayer({
     [ensureBookmarkId, syncWatchProgress],
   );
 
-  // --- Construct Stream URI via active HLS proxy (/api/proxy or local companion) ---
+  // --- Construct Stream URI via active HLS proxy ---
   const firstSource = episodeInfo?.sources?.[0];
   const uri = useMemo(() => {
     if (!firstSource?.url) return null;
@@ -198,17 +198,25 @@ function AniflixPlayer({
         let history: any[] = [];
         if (id.startsWith("guest-")) {
           try {
-            const stored = JSON.parse(localStorage.getItem("aniflix_guest_bookmarks") || "[]");
-            const guestBookmark = Array.isArray(stored) ? stored.find((item: any) => item.id === id) : null;
+            const stored = JSON.parse(
+              localStorage.getItem("aniflix_guest_bookmarks") || "[]",
+            );
+            const guestBookmark = Array.isArray(stored)
+              ? stored.find((item: any) => item.id === id)
+              : null;
             history = guestBookmark?.expand?.watchHistory || [];
           } catch {
             history = [];
           }
         } else {
-          const expandedBookmark = await (await import("@/lib/pocketbase")).pb.collection("bookmarks").getOne(id, {
-            expand: "watchHistory",
-            requestKey: null,
-          });
+          const expandedBookmark = await (
+            await import("@/lib/pocketbase")
+          ).pb
+            .collection("bookmarks")
+            .getOne(id, {
+              expand: "watchHistory",
+              requestKey: null,
+            });
           history = expandedBookmark.expand?.watchHistory || [];
         }
 
@@ -269,9 +277,7 @@ function AniflixPlayer({
 
   // --- Effect for Player Initialization and Cleanup ---
   useEffect(() => {
-    // Wait for container ref and valid URI
     if (!artContainerRef.current || !uri) {
-      // Clean up previous instances if URI becomes invalid or ref detach
       if (hlsInstanceRef.current) {
         hlsInstanceRef.current.destroy();
         hlsInstanceRef.current = null;
@@ -283,7 +289,6 @@ function AniflixPlayer({
       return;
     }
 
-    // Make sure start/end are valid numbers before creating range
     const introStart = episodeInfo?.intro?.start;
     const introEnd = episodeInfo?.intro?.end;
     skipTimesRef.current.validIntro =
@@ -294,15 +299,14 @@ function AniflixPlayer({
     skipTimesRef.current.introEnd = introEnd;
 
     const outroStart = episodeInfo?.outro?.start;
-    const outroEnd = episodeInfo?.outro?.end; // Use let for potential modification
+    const outroEnd = episodeInfo?.outro?.end;
     skipTimesRef.current.validOutro =
       typeof outroStart === "number" &&
       typeof outroEnd === "number" &&
-      outroStart < outroEnd; // Adjust condition if needed
+      outroStart < outroEnd;
     skipTimesRef.current.outroStart = outroStart;
-    skipTimesRef.current.outroEnd = outroEnd; // Store the raw value
+    skipTimesRef.current.outroEnd = outroEnd;
 
-    // Subtitle Track Selector Options - prioritize English as default
     const isEnglish = (lang?: string) => {
       const l = (lang || "").toLowerCase();
       return l === "en" || l === "eng" || l.includes("english");
@@ -319,7 +323,8 @@ function AniflixPlayer({
       validSubtitles[0]?.url;
 
     const defaultTrackObj = validSubtitles.find((t) => t.url === defaultTrack);
-    const defaultTrackTitle = defaultTrackObj?.lang || (validSubtitles.length > 0 ? "English" : "Off");
+    const defaultTrackTitle =
+      defaultTrackObj?.lang || (validSubtitles.length > 0 ? "English" : "Off");
 
     const defaultTrackProxyUrl = defaultTrack
       ? buildStreamProxyUrl({
@@ -339,9 +344,10 @@ function AniflixPlayer({
       ? defaultTrack.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase()
       : "vtt";
     const defaultTrackType =
-      defaultTrackExt === "srt" || defaultTrackExt === "ass" ? defaultTrackExt : "vtt";
+      defaultTrackExt === "srt" || defaultTrackExt === "ass"
+        ? defaultTrackExt
+        : "vtt";
 
-    // Direct Subtitle Option based on subOrDub
     const subtitleConfig: Option["subtitle"] =
       subOrDub === "sub" && defaultTrackProxyUrl
         ? {
@@ -358,24 +364,24 @@ function AniflixPlayer({
         : {};
 
     const manualSkipControl = {
-      name: "manual-skip", // Unique name
-      position: "right", // Place near other controls
+      name: "manual-skip",
+      position: "right",
       html: `
-                <div style="display: flex; align-items: center; gap: 4px; padding: 0 6px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>
-                    <span class="art-skip-text">Skip</span>
-                </div>
-            `, // Icon + Text (use a class for text if needed)
-      tooltip: "Skip", // Initial tooltip
+        <div style="display: flex; align-items: center; gap: 4px; padding: 0 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>
+          <span class="art-skip-text">Skip</span>
+        </div>
+      `,
+      tooltip: "Skip",
       style: {
-        display: "none", // Start hidden
+        display: "none",
         cursor: "pointer",
         borderRadius: "4px",
-        marginRight: "10px", // Space from toggle
-        padding: "3px 0", // Adjust padding for vertical centering
+        marginRight: "10px",
+        padding: "3px 0",
       },
-      click: function(controlItem: any) {
+      click: function (controlItem: any) {
         const art = artInstanceRef.current;
         if (!art) return;
         const { introEnd, outroStart, outroEnd, validIntro, validOutro } =
@@ -401,23 +407,20 @@ function AniflixPlayer({
           currentTime >= outroStart &&
           currentTime < resolvedOutroEnd
         ) {
-          // Seek slightly before end if target is duration
           seekTarget =
             resolvedOutroEnd === duration ? duration - 0.1 : resolvedOutroEnd;
         }
 
         if (typeof seekTarget === "number") {
-          art.seek = Math.min(seekTarget, duration); // Seek
+          art.seek = Math.min(seekTarget, duration);
         }
 
-        // Hide the button immediately after click
         if (controlItem.style) controlItem.style.display = "none";
       },
     };
 
     let currentHlsInstanceForCleanup: Hls | null = null;
 
-    // Combine All Options
     const finalOptions: Option = {
       container: artContainerRef.current,
       url: uri,
@@ -429,36 +432,89 @@ function AniflixPlayer({
           artPlayerInstance: Artplayer,
         ) => {
           if (Hls.isSupported()) {
-            // Destroy previous HLS instance if attached to this player
             if (hlsInstanceRef.current) {
               hlsInstanceRef.current.destroy();
             }
-            const hls = new Hls();
+            const hls = new Hls({
+              enableWorker: true,
+              lowLatencyMode: false,
+            });
             hls.loadSource(url);
             hls.attachMedia(videoElement);
+
+            // Audio Language Syncing Engine
             if (targetAudioLanguage) {
               const applyTargetLanguage = () => {
-                const langLower = targetAudioLanguage.toLowerCase();
-                const trackIdx = hls.audioTracks.findIndex((t: any) =>
-                  (t.name && t.name.toLowerCase().includes(langLower)) ||
-                  (t.lang && t.lang.toLowerCase().startsWith(langLower.slice(0, 2)))
-                );
+                if (!hls.audioTracks || hls.audioTracks.length === 0) return;
+
+                const target = targetAudioLanguage.toLowerCase().trim();
+                const trackIdx = hls.audioTracks.findIndex((track: any) => {
+                  const name = (track.name || "").toLowerCase().trim();
+                  const lang = (track.lang || "").toLowerCase().trim();
+
+                  if (target === "tamil") {
+                    return (
+                      name.includes("tamil") ||
+                      name.includes("tam") ||
+                      lang === "ta" ||
+                      lang.startsWith("tam")
+                    );
+                  }
+                  if (target === "telugu") {
+                    return (
+                      name.includes("telugu") ||
+                      name.includes("tel") ||
+                      lang === "te" ||
+                      lang.startsWith("tel")
+                    );
+                  }
+                  if (target === "hindi") {
+                    return (
+                      name.includes("hindi") ||
+                      name.includes("hin") ||
+                      lang === "hi" ||
+                      lang.startsWith("hin")
+                    );
+                  }
+                  if (target === "malayalam") {
+                    return (
+                      name.includes("malayalam") ||
+                      name.includes("mal") ||
+                      lang === "ml" ||
+                      lang.startsWith("mal")
+                    );
+                  }
+                  if (target === "english") {
+                    return (
+                      name.includes("english") ||
+                      name.includes("eng") ||
+                      lang === "en" ||
+                      lang.startsWith("eng")
+                    );
+                  }
+
+                  return name.includes(target) || lang.includes(target);
+                });
+
                 if (trackIdx !== -1 && hls.audioTrack !== trackIdx) {
                   hls.audioTrack = trackIdx;
                 }
               };
-              hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, applyTargetLanguage);
+
               hls.on(Hls.Events.MANIFEST_PARSED, applyTargetLanguage);
+              hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, applyTargetLanguage);
+              hls.on(Hls.Events.LEVEL_LOADED, applyTargetLanguage);
             }
+
             hls.on(Hls.Events.ERROR, (event, data) => {
               if (data.fatal) {
                 console.error("Fatal HLS error encountered:", data);
                 if (onError) onError();
               }
             });
-            hlsInstanceRef.current = hls; // Store ref
-            currentHlsInstanceForCleanup = hls; // Store for cleanup
-            // Make sure HLS instance is destroyed when ArtPlayer instance is destroyed
+            hlsInstanceRef.current = hls;
+            currentHlsInstanceForCleanup = hls;
+
             artPlayerInstance.on("destroy", () => {
               if (hlsInstanceRef.current === hls) {
                 hls.destroy();
@@ -469,7 +525,7 @@ function AniflixPlayer({
           } else if (
             videoElement.canPlayType("application/vnd.apple.mpegurl")
           ) {
-            videoElement.src = url; // Fallback for Safari native HLS
+            videoElement.src = url;
           } else {
             artPlayerInstance.notice.show =
               "HLS playback is not supported on your browser.";
@@ -478,26 +534,25 @@ function AniflixPlayer({
       },
       plugins: [
         artplayerPluginHlsControl({
-          // Configure HLS controls
           quality: {
             control: true,
             setting: true,
             getName: (level: { height?: number; bitrate?: number }) =>
-              level.height ? `${level.height}P` : "Auto", // Type level
+              level.height ? `${level.height}P` : "Auto",
             title: "Quality",
             auto: "Auto",
           },
           audio: {
             control: true,
             setting: true,
-            getName: (track: { name?: string }) => track.name ?? "Unknown", // Type track
+            getName: (track: { name?: string; lang?: string }) =>
+              track.name ?? track.lang ?? "Unknown",
             title: "Audio",
             auto: "Auto",
           },
         }),
         artplayerPluginAmbilight({
-          // Configure Ambilight
-          blur: "30", // Use numbers
+          blur: "30",
           opacity: 0.8,
           frequency: 10,
           duration: 0.3,
@@ -505,7 +560,6 @@ function AniflixPlayer({
         }),
       ],
       settings: [
-        // Configure settings panel items
         {
           width: 250,
           html: "Subtitle",
@@ -513,19 +567,18 @@ function AniflixPlayer({
           selector: [
             {
               html: "Display",
-              tooltip: subOrDub === "sub" ? "Hide" : "Show", // Initial state based on prop
-              switch: subOrDub === "sub", // Switch is ON if sub
-              onSwitch: function(item) {
-                const showSubtitle = !item.switch; // The new state
+              tooltip: subOrDub === "sub" ? "Hide" : "Show",
+              switch: subOrDub === "sub",
+              onSwitch: function (item) {
+                const showSubtitle = !item.switch;
                 art.subtitle.show = showSubtitle;
                 item.tooltip = showSubtitle ? "Hide" : "Show";
-                console.log(`Subtitle display set to: ${showSubtitle}`);
-                return showSubtitle; // Return the new switch state
+                return showSubtitle;
               },
             },
-            ...trackOptions, // Add subtitle track choices
+            ...trackOptions,
           ],
-          onSelect: async function(item: any) {
+          onSelect: async function (item: any) {
             if (item.url && typeof item.url === "string") {
               const proxiedUrl = buildStreamProxyUrl({
                 url: item.url,
@@ -594,11 +647,9 @@ function AniflixPlayer({
       },
     };
 
-    // --- Initialize ArtPlayer ---
     const art = new Artplayer(finalOptions);
     artInstanceRef.current = art;
 
-    // --- Skip Logic Handler ---
     const handleTimeUpdate = () => {
       const art = artInstanceRef.current;
       if (!art || art.loading.show) return;
@@ -616,7 +667,7 @@ function AniflixPlayer({
         outroStart,
         outroEnd,
         validOutro,
-      } = skipTimesRef.current; // Use ref
+      } = skipTimesRef.current;
 
       const resolvedOutroEnd =
         validOutro && outroEnd === 0 && duration > 0 ? duration : outroEnd;
@@ -633,13 +684,10 @@ function AniflixPlayer({
         currentTime >= outroStart &&
         currentTime < resolvedOutroEnd;
 
-      // Get the manual skip control instance *once* per update
-      const manualSkip = art.controls["manual-skip"]; // Access by name
+      const manualSkip = art.controls["manual-skip"];
 
       if (isAutoSkipEnabledRef.current) {
-        // Auto Skip Logic
         if (manualSkip?.style?.display !== "none") {
-          // Ensure manual button is hidden
           if (manualSkip?.style) manualSkip.style.display = "none";
         }
         if (inIntro && typeof introEnd === "number") {
@@ -650,30 +698,24 @@ function AniflixPlayer({
           art.seek = Math.min(seekTarget, duration);
         }
       } else {
-        // Manual Skip Button Logic
-        if (!manualSkip) return; // Guard if control not found
+        if (!manualSkip) return;
 
         if (inIntro || inOutro) {
-          // Show the button
           if (manualSkip.style?.display === "none") {
             if (manualSkip.style) manualSkip.style.display = "inline-flex";
           }
-          // Update text/tooltip
           const skipText = inIntro ? "Intro" : "Outro";
           const textElement = manualSkip.querySelector(".art-skip-text");
           if (textElement && textElement.textContent !== `Skip ${skipText}`) {
             textElement.textContent = `Skip ${skipText}`;
           }
         } else {
-          // Hide the button
           if (manualSkip.style?.display !== "none") {
             if (manualSkip.style) manualSkip.style.display = "none";
           }
         }
       }
 
-      // --- Watch Progress Tracking ---
-      // 1. Check if minimum watch time is met to potentially create record
       if (
         !hasMetMinWatchTimeRef.current &&
         currentTime >= WATCH_PROGRESS_MIN_WATCH_TIME &&
@@ -686,7 +728,6 @@ function AniflixPlayer({
         }
       }
 
-      // 2. Throttle updates every 10s if playing and min time met OR record already exists
       if (
         duration > 0 &&
         (hasMetMinWatchTimeRef.current || watchedRecordIdRef.current) &&
@@ -697,7 +738,6 @@ function AniflixPlayer({
       }
     };
 
-    // --- Event Listeners ---
     art.on("ready", () => {
       try {
         Object.defineProperty(art.subtitle, "textTrack", {
@@ -717,7 +757,7 @@ function AniflixPlayer({
       art.subtitle.style({
         fontSize: Math.max(14, Math.min(32, art.height * 0.04)) + "px",
       });
-      // --- SEEK TO LAST POSITION ---
+
       const seekTime = initialSeekTimeRef.current;
       if (
         seekTime !== null &&
@@ -775,12 +815,10 @@ function AniflixPlayer({
     art.on("video:seeked", handleInteractionUpdate);
     art.on("video:ended", handleInteractionUpdate);
 
-    // --- Callback for Parent ---
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
 
-    // --- Cleanup Function ---
     return () => {
       const art = artInstanceRef.current;
       const hls = hlsInstanceRef.current;
@@ -836,14 +874,12 @@ function AniflixPlayer({
         }
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uri, subOrDub]);
+  }, [uri, subOrDub, targetAudioLanguage]);
 
-  // --- Render ---
   return (
     <div
       className={cn(
-        "relative w-full h-auto aspect-video  min-h-[20vh] sm:min-h-[30vh] md:min-h-[40vh] lg:min-h-[60vh] max-h-[500px] lg:max-h-[calc(100vh-150px)] bg-black overflow-hidden", // Added relative and overflow-hidden
+        "relative w-full h-auto aspect-video min-h-[20vh] sm:min-h-[30vh] md:min-h-[40vh] lg:min-h-[60vh] max-h-[500px] lg:max-h-[calc(100vh-150px)] bg-black overflow-hidden",
         rest.className ?? "",
       )}
     >
